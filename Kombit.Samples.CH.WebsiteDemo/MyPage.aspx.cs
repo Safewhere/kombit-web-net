@@ -7,6 +7,7 @@ using dk.nita.saml20.config;
 using dk.nita.saml20.identity;
 using dk.nita.saml20.Logging;
 using dk.nita.saml20.protocol;
+using dk.nita.saml20.Session;
 using dk.nita.saml20.session;
 using Kombit.Samples.BasicPrivilegeProfileParser;
 
@@ -75,7 +76,11 @@ namespace Kombit.Samples.CH.WebsiteDemo
 
         private void HandleReloginNoForceAuthnAssuranceLevel(int assuranceLevel)
         {
-            SessionFactory.SessionContext.Current[SessionConstants.RequestedAssuranceLevel] = "urn:dk:gov:saml:attribute:AssuranceLevel:" + assuranceLevel;
+            var session = SessionStore.CurrentSession;
+            if (session != null)
+            {
+                SessionStore.CurrentSession[SessionConstants.RequestedAssuranceLevel] = "urn:dk:gov:saml:attribute:AssuranceLevel:" + assuranceLevel;
+            }
             Response.Redirect("/login.ashx?ReturnUrl=" + HttpContext.Current.Request.Url.AbsolutePath);
         }
 
