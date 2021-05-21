@@ -122,7 +122,14 @@ namespace Kombit.Samples.CH.WebsiteDemo
             if (!current.HasAttribute("dk:gov:saml:attribute:CvrNumberIdentifier"))
                 return false;
             if (!current.HasAttribute("dk:gov:saml:attribute:Privileges_intermediate"))
+                return false;            
+            if (!current.HasAttribute("https://data.gov.dk/model/core/specVersion"))
                 return false;
+            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/privilegesIntermediate"))
+                return false;
+            if (!current.HasAttribute("https://data.gov.dk/concept/core/nsis/loa"))
+                return false;
+            // todo: add more must have claim types
 
             return true;
         }

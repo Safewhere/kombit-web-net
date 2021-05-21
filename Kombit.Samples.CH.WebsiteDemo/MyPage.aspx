@@ -17,7 +17,7 @@
         <div class="div-metadata-mypage-title" >
             <span class="title"><b>My page:</b></span>
         </div>
-        <b>WELCOME, <%= Saml20Identity.Current.Name + (Saml20Identity.Current.PersistentPseudonym != null ? " (Pseudonym is " + Saml20Identity.Current.PersistentPseudonym + ")" : String.Empty) %></b>
+        <b>WELCOME, <%= Saml20Identity.Current.Name %></b>
         <table>
             <thead>
                 <tr>

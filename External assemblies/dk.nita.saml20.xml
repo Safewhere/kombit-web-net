@@ -1950,6 +1950,56 @@
             <param name="msg">A message describing the problem that caused the exception.</param>
             <param name="cause">Another exception that may be related to the problem.</param>
         </member>
+        <member name="T:dk.nita.saml20.ExtendedEncryptedXml">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="M:dk.nita.saml20.ExtendedEncryptedXml.#ctor">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="M:dk.nita.saml20.ExtendedEncryptedXml.GetDecryptionIV(System.Security.Cryptography.Xml.EncryptedData,System.String)">
+            <summary>
+            This override GetDecryptionIV to support the Aes-Gcm encryption algorithm
+            </summary>
+            <param name="encryptedData"></param>
+            <param name="symmetricAlgorithmUri"></param>
+            <returns></returns>
+        </member>
+        <member name="T:dk.nita.saml20.ExtendedRsaModeOaepSha256">
+            <summary>
+            Extend RSA class supporting OAEP - SHA256
+            </summary>
+        </member>
+        <member name="M:dk.nita.saml20.ExtendedRsaModeOaepSha256.#ctor(System.Security.Cryptography.X509Certificates.X509Certificate2)">
+            <summary>
+            Constructor take parameter certificate used for customizing encrypt/decrypt with OaepSHA256
+            </summary>
+            <param name="certificate"></param>
+        </member>
+        <member name="M:dk.nita.saml20.ExtendedRsaModeOaepSha256.Decrypt(System.Byte[],System.Security.Cryptography.RSAEncryptionPadding)">
+            <summary>
+            Decrypting the input data using the specified OaepSHA256 padding mode.
+            </summary>
+            <param name="data"></param>
+            <param name="padding"></param>
+            <returns></returns>
+        </member>
+        <member name="M:dk.nita.saml20.ExtendedRsaModeOaepSha256.ExportParameters(System.Boolean)">
+            <summary>
+            Exporting the System.Security.Cryptography.RSAParameters
+            </summary>
+            <param name="includePrivateParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:dk.nita.saml20.ExtendedRsaModeOaepSha256.ImportParameters(System.Security.Cryptography.RSAParameters)">
+            <summary>
+            Importing the specified System.Security.Cryptography.RSAParameters
+            </summary>
+            <param name="parameters"></param>
+        </member>
         <member name="T:dk.nita.saml20.Identity.Saml20PrincipalCache">
             <summary>
             
@@ -8585,12 +8635,12 @@
         </member>
         <member name="T:dk.nita.saml20.Saml20EncryptedAssertion">
             <summary>
-            Handles the <code>EncryptedAssertion</code> element. 
+            Handles the <code>EncryptedAssertion</code> element.
             </summary>
         </member>
         <member name="F:dk.nita.saml20.Saml20EncryptedAssertion.USE_OAEP_DEFAULT">
             <summary>
-            Whether to use OAEP (Optimal Asymmetric Encryption Padding) by default, if no EncryptionMethod is specified 
+            Whether to use OAEP (Optimal Asymmetric Encryption Padding) by default, if no EncryptionMethod is specified
             on the &lt;EncryptedKey&gt; element.
             </summary>
         </member>
@@ -8618,7 +8668,13 @@
             <summary>
             Initializes a new instance of <code>EncryptedAssertion</code>.
             </summary>
-            <param name="transportKey">The transport key is used for securing the symmetric key that has encrypted the assertion.</param>        
+            <param name="transportKey">The transport key is used for securing the symmetric key that has encrypted the assertion.</param>
+        </member>
+        <member name="M:dk.nita.saml20.Saml20EncryptedAssertion.#ctor(System.Security.Cryptography.X509Certificates.X509Certificate2)">
+            <summary>
+            Initializes a new instance of <code>EncryptedAssertion</code>.
+            </summary>
+            <param name="certificate">The certificate is used for deriving transport key or customizing the way to use RSA decrypt/encrypt the assertion</param>
         </member>
         <member name="M:dk.nita.saml20.Saml20EncryptedAssertion.#ctor(System.Security.Cryptography.RSA,System.Xml.XmlDocument)">
             <summary>
@@ -8640,13 +8696,13 @@
         <member name="M:dk.nita.saml20.Saml20EncryptedAssertion.GetXml">
             <summary>
             Returns the XML representation of the encrypted assertion.
-            </summary>        
+            </summary>
         </member>
         <member name="P:dk.nita.saml20.Saml20EncryptedAssertion.SessionKeyAlgorithm">
             <summary>
-            Specifiy the algorithm to use for the session key. The algorithm is specified using the identifiers given in the 
+            Specifiy the algorithm to use for the session key. The algorithm is specified using the identifiers given in the
             Xml Encryption Specification. see also http://www.w3.org/TR/xmlenc-core/#sec-Algorithms
-            The class <code>EncryptedXml</code> contains public fields with the identifiers. If nothing is 
+            The class <code>EncryptedXml</code> contains public fields with the identifiers. If nothing is
             specified, a 256 bit AES key is used.
             </summary>
         </member>
@@ -8669,7 +8725,7 @@
         </member>
         <member name="M:dk.nita.saml20.Saml20EncryptedAssertion.ExtractSessionKey(System.Xml.XmlDocument,System.String)">
             <summary>
-            Locates and deserializes the key used for encrypting the assertion. Searches the list of keys below the &lt;EncryptedAssertion&gt; element and 
+            Locates and deserializes the key used for encrypting the assertion. Searches the list of keys below the &lt;EncryptedAssertion&gt; element and
             the &lt;KeyInfo&gt; element of the &lt;EncryptedData&gt; element.
             </summary>
             <param name="encryptedAssertionDoc"></param>
@@ -8686,11 +8742,11 @@
         </member>
         <member name="M:dk.nita.saml20.Saml20EncryptedAssertion.GetKeyInstance(System.String)">
             <summary>
-            Creates an instance of a symmetric key, based on the algorithm identifier found in the Xml Encryption standard.        
+            Creates an instance of a symmetric key, based on the algorithm identifier found in the Xml Encryption standard.
             see also http://www.w3.org/TR/xmlenc-core/#sec-Algorithms
             </summary>
             <param name="algorithm">A string containing one of the algorithm identifiers found in the XML Encryption standard. The class
-            <code>EncryptedXml</code> contains the identifiers as fields.</param>        
+            <code>EncryptedXml</code> contains the identifiers as fields.</param>
         </member>
         <member name="M:dk.nita.saml20.Saml20EncryptedAssertion.GetElement(System.String,System.String,System.Xml.XmlElement)">
             <summary>
@@ -9151,6 +9207,11 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:dk.nita.saml20.Session.SessionStore.CreateSessionIfNotExists">
+            <summary>
+            Create a new session for current user
+            </summary>
+        </member>
         <member name="M:dk.nita.saml20.Session.SessionStore.AssociateUserIdWithCurrentSession(System.String)">
             <summary>
             Associates the given userId with the current session id
@@ -9174,6 +9235,18 @@
             Checks whether or not the user has a session
             SamlAssertionLite is the only item in the session store after a succesful login flow. This is what implicit makes the session exist.
             </summary>
+        </member>
+        <member name="T:dk.nita.saml20.Session.UserSession">
+            <summary>
+            Keep configuration data of each user session
+            </summary>
+        </member>
+        <member name="M:dk.nita.saml20.Session.UserSession.#ctor(dk.nita.saml20.Session.ISessionStoreProvider,System.Guid)">
+            <summary>
+            Constructor of UserSession
+            </summary>
+            <param name="sessionStoreProvider"></param>
+            <param name="sessionId"></param>
         </member>
         <member name="P:dk.nita.saml20.Session.UserSession.SessionId">
             <summary>
