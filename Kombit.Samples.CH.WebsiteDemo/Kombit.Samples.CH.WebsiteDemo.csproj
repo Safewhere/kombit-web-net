@@ -141,10 +141,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Safewhere.ServiceProvider, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\External assemblies\Safewhere.ServiceProvider.dll</HintPath>
-    </Reference>
     <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Serilog.1.5.12\lib\net45\Serilog.dll</HintPath>
@@ -228,7 +224,6 @@
     <Compile Include="sp.Master.designer.cs">
       <DependentUpon>sp.Master</DependentUpon>
     </Compile>
-    <Compile Include="X509CertificateSigningSecurityTokenResolverFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="login.ashx" />
