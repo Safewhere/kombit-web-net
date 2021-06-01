@@ -116,8 +116,6 @@ namespace Kombit.Samples.CH.WebsiteDemo
                 return false;
             if (!current.HasAttribute("https://data.gov.dk/model/core/eid/email"))
                 return false;
-            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/cprNumber"))
-                return false;
             if (!current.HasAttribute("https://data.gov.dk/model/core/eid/professional/cvr"))
                 return false;
             if (!current.HasAttribute("https://data.gov.dk/model/core/eid/professional/orgName"))
