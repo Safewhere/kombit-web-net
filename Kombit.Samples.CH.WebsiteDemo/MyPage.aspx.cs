@@ -7,6 +7,7 @@ using dk.nita.saml20.config;
 using dk.nita.saml20.identity;
 using dk.nita.saml20.Logging;
 using dk.nita.saml20.protocol;
+using dk.nita.saml20.Session;
 using dk.nita.saml20.session;
 using Kombit.Samples.BasicPrivilegeProfileParser;
 
@@ -53,29 +54,28 @@ namespace Kombit.Samples.CH.WebsiteDemo
             Response.Redirect("/login.ashx?ReturnUrl=" + HttpContext.Current.Request.Url.AbsolutePath);
         }
 
-        protected void Btn_ReloginNoForceAuthnAssuranceLevel1_Click(object sender, EventArgs e)
+        protected void Btn_ReloginNoForceAuthnNSISAssuranceLevelLow_Click(object sender, EventArgs e)
         {
-            HandleReloginNoForceAuthnAssuranceLevel(1);
+            HandleReloginNoForceAuthnAssuranceLevel("Low");
         }
 
-        protected void Btn_ReloginNoForceAuthnAssuranceLevel2_Click(object sender, EventArgs e)
+        protected void Btn_ReloginNoForceAuthnNSISAssuranceLevelSubstantial_Click(object sender, EventArgs e)
         {
-            HandleReloginNoForceAuthnAssuranceLevel(2);
+            HandleReloginNoForceAuthnAssuranceLevel("Substantial");
         }
 
-        protected void Btn_ReloginNoForceAuthnAssuranceLevel3_Click(object sender, EventArgs e)
+        protected void Btn_ReloginNoForceAuthnNSISAssuranceLevelHigh_Click(object sender, EventArgs e)
         {
-            HandleReloginNoForceAuthnAssuranceLevel(3);
+            HandleReloginNoForceAuthnAssuranceLevel("High");
         }
 
-        protected void Btn_ReloginNoForceAuthnAssuranceLevel4_Click(object sender, EventArgs e)
+        private void HandleReloginNoForceAuthnAssuranceLevel(string nsisAssuranceLevel)
         {
-            HandleReloginNoForceAuthnAssuranceLevel(4);
-        }
-
-        private void HandleReloginNoForceAuthnAssuranceLevel(int assuranceLevel)
-        {
-            SessionFactory.SessionContext.Current[SessionConstants.RequestedAssuranceLevel] = "urn:dk:gov:saml:attribute:AssuranceLevel:" + assuranceLevel;
+            var session = SessionStore.CurrentSession;
+            if (session != null)
+            {
+                SessionStore.CurrentSession[SessionConstants.RequestedAssuranceLevel] = "https://data.gov.dk/concept/core/nsis/loa/" + nsisAssuranceLevel;
+            }
             Response.Redirect("/login.ashx?ReturnUrl=" + HttpContext.Current.Request.Url.AbsolutePath);
         }
 
@@ -108,15 +108,19 @@ namespace Kombit.Samples.CH.WebsiteDemo
         {
             if (current == null)
                 throw new ArgumentNullException("current");
-            if (!current.HasAttribute("dk:gov:saml:attribute:AssuranceLevel"))
+            if (!current.HasAttribute("https://data.gov.dk/model/core/specVersion"))
                 return false;
-            if (!current.HasAttribute("dk:gov:saml:attribute:SpecVer"))
+            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/privilegesIntermediate"))
+                return false;
+            if (!current.HasAttribute("https://data.gov.dk/concept/core/nsis/loa"))
+                return false;
+            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/email"))
+                return false;
+            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/professional/cvr"))
+                return false;
+            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/professional/orgName"))
                 return false;
             if (!current.HasAttribute("dk:gov:saml:attribute:KombitSpecVer"))
-                return false;
-            if (!current.HasAttribute("dk:gov:saml:attribute:CvrNumberIdentifier"))
-                return false;
-            if (!current.HasAttribute("dk:gov:saml:attribute:Privileges_intermediate"))
                 return false;
 
             return true;

@@ -17,7 +17,7 @@
         <div class="div-metadata-mypage-title" >
             <span class="title"><b>My page:</b></span>
         </div>
-        <b>WELCOME, <%= Saml20Identity.Current.Name + (Saml20Identity.Current.PersistentPseudonym != null ? " (Pseudonym is " + Saml20Identity.Current.PersistentPseudonym + ")" : String.Empty) %></b>
+        <b>WELCOME, <%= Saml20Identity.Current.Name %></b>
         <table>
             <thead>
                 <tr>
@@ -50,10 +50,9 @@
         <asp:Button Id="Btn_ReloginNoForceAuthn" CssClass="btn btn-info" runat="server" Enabled="true" Text="No ForceAuthn" OnClick="Btn_ReloginNoForceAuthn_Click" />
         <% if (System.Configuration.ConfigurationManager.AppSettings["OfferAssuranceLevel"] == "true")
         { %>
-            <asp:Button Id="Btn_ReloginNoForceAuthn_AssuranceLevel1" CssClass="btn btn-info" runat="server" Enabled="true" Text="No ForceAuthn - Assurance Level 1" OnClick="Btn_ReloginNoForceAuthnAssuranceLevel1_Click" />
-            <asp:Button Id="Btn_ReloginNoForceAuthn_AssuranceLevel2" CssClass="btn btn-info" runat="server" Enabled="true" Text="No ForceAuthn - Assurance Level 2" OnClick="Btn_ReloginNoForceAuthnAssuranceLevel2_Click" />
-            <asp:Button Id="Btn_ReloginNoForceAuthn_AssuranceLevel3" CssClass="btn btn-info" runat="server" Enabled="true" Text="No ForceAuthn - Assurance Level 3" OnClick="Btn_ReloginNoForceAuthnAssuranceLevel3_Click" />
-            <asp:Button Id="Btn_ReloginNoForceAuthn_AssuranceLevel4" CssClass="btn btn-info" runat="server" Enabled="true" Text="No ForceAuthn - Assurance Level 4" OnClick="Btn_ReloginNoForceAuthnAssuranceLevel4_Click" />
+            <asp:Button Id="Btn_ReloginNoForceAuthn_NSISAssuranceLevelLow" CssClass="btn btn-info" runat="server" Enabled="true" Text="No ForceAuthn - NSIS Assurance Level Low" OnClick="Btn_ReloginNoForceAuthnNSISAssuranceLevelLow_Click" />
+            <asp:Button Id="Btn_ReloginNoForceAuthn_NSISAssuranceLevelSubstantial" CssClass="btn btn-info" runat="server" Enabled="true" Text="No ForceAuthn - NSIS Assurance Level Substantial" OnClick="Btn_ReloginNoForceAuthnNSISAssuranceLevelSubstantial_Click" />
+            <asp:Button Id="Btn_ReloginNoForceAuthn_NSISAssuranceLevelHigh" CssClass="btn btn-info" runat="server" Enabled="true" Text="No ForceAuthn - NSIS Assurance Level High" OnClick="Btn_ReloginNoForceAuthnNSISAssuranceLevelHigh_Click" />            
         
         <% } %>
             <hr style="border-top:dotted;  border-width:1px;" />
