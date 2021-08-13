@@ -10,6 +10,8 @@ using dk.nita.saml20.protocol;
 using dk.nita.saml20.Session;
 using dk.nita.saml20.session;
 using Kombit.Samples.BasicPrivilegeProfileParser;
+using System.Collections.Generic;
+using System.Text;
 
 #endregion
 
@@ -107,26 +109,53 @@ namespace Kombit.Samples.CH.WebsiteDemo
             return value;            
         }
 
-        protected static bool ValidateKombitAttributeProfile(Saml20Identity current)
+        protected static void ValidateKombitAttributeProfile(Saml20Identity current)
         {
             if (current == null)
                 throw new ArgumentNullException("current");
-            if (!current.HasAttribute("https://data.gov.dk/model/core/specVersion"))
-                return false;
-            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/privilegesIntermediate"))
-                return false;
-            if (!current.HasAttribute("https://data.gov.dk/concept/core/nsis/loa"))
-                return false;
-            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/email"))
-                return false;
-            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/professional/cvr"))
-                return false;
-            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/professional/orgName"))
-                return false;
-            if (!current.HasAttribute("dk:gov:saml:attribute:KombitSpecVer"))
-                return false;
+            
+            StringBuilder missingClaimTypes = new StringBuilder();
 
-            return true;
+            if (!current.HasAttribute("https://data.gov.dk/model/core/specVersion"))
+            {
+                missingClaimTypes.Append("https://data.gov.dk/model/core/specVersion,");
+            }
+
+            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/privilegesIntermediate"))
+            {
+                missingClaimTypes.Append("https://data.gov.dk/model/core/eid/privilegesIntermediate,");
+            }
+
+            if (!current.HasAttribute("https://data.gov.dk/concept/core/nsis/loa"))
+            {
+                missingClaimTypes.Append("https://data.gov.dk/concept/core/nsis/loa,");
+            }
+
+            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/email"))
+            {
+                missingClaimTypes.Append("https://data.gov.dk/model/core/eid/email,");
+            }
+
+            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/professional/cvr"))
+            {
+                missingClaimTypes.Append("https://data.gov.dk/model/core/eid/professional/cvr,");
+            }
+
+            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/professional/orgName"))
+            {
+                missingClaimTypes.Append("https://data.gov.dk/model/core/eid/professional/orgName,");
+            }
+
+            if (!current.HasAttribute("dk:gov:saml:attribute:KombitSpecVer"))
+            {
+                missingClaimTypes.Append("dk:gov:saml:attribute:KombitSpecVer,");
+            }
+            
+            if (missingClaimTypes.Length > 0)
+            {
+                var errorMessage = missingClaimTypes.ToString().TrimEnd(',');
+                throw new Exception(string.Format("Saml assertion does not meet Kombit profile. It is missing following claim types: {0}", errorMessage));
+            }
         }
     }
 }

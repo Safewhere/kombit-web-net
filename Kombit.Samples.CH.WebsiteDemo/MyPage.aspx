@@ -2,10 +2,8 @@
 <%@ Import Namespace="dk.nita.saml20.identity" %>
 <%@ Import Namespace="dk.nita.saml20.Schema.Core" %>
 <asp:Content ID="Content2" runat="server" ContentPlaceHolderID="ContentPlaceHolder1">
-    <% if (!ValidateKombitAttributeProfile(Saml20Identity.Current))
-       {
-           throw new Exception("Saml assertion does not meet Kombit profile. It must have AssuranceLevel, SpecVer, KombitSpecVer, Service and Previlege");
-       } %>
+    <% ValidateKombitAttributeProfile(Saml20Identity.Current);
+       %>
     <% if (System.Configuration.ConfigurationManager.AppSettings["OfferAssuranceLevel"] != "true" &&
             int.Parse(Saml20Identity.Current["dk:gov:saml:attribute:AssuranceLevel"][0].AttributeValue[0]) < 3)
        {
