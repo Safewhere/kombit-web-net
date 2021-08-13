@@ -98,7 +98,7 @@ namespace Kombit.Samples.CH.WebsiteDemo
         /// <returns></returns>
         protected static string RenderAttributeValue(string name, string value)
         {
-            if (name == "dk:gov:saml:attribute:Privileges_intermediate" || name == "https://data.gov.dk/model/core/eid/privilegesIntermediate")
+            if (name == "https://data.gov.dk/model/core/eid/privilegesIntermediate")
             {
                 //Below is the code to parse bpp value and handle the role validation process
                 //var decodedBpp = Encoding.UTF8.GetString(Convert.FromBase64String(value));
