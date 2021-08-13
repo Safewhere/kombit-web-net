@@ -126,7 +126,6 @@
       <HintPath>..\External assemblies\dk.nita.saml20.ext.brs.dll</HintPath>
     </Reference>
     <Reference Include="Kombit.Samples.BasicPrivilegeProfileParser, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Kombit.Samples.BasicPrivilegeProfileParser.1.0.0.0\lib\net45\Kombit.Samples.BasicPrivilegeProfileParser.dll</HintPath>
     </Reference>
     <Reference Include="Kombit.Samples.Common, Version=1.0.0.3, Culture=neutral, processorArchitecture=MSIL">

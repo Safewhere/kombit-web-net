@@ -96,32 +96,58 @@ namespace Kombit.Samples.CH.WebsiteDemo
         /// <returns></returns>
         protected static string RenderAttributeValue(string name, string value)
         {
-            if (name != "dk:gov:saml:attribute:Privileges_intermediate")
-                return value;
-            //Below is the code to parse bpp value and handle the role validation process
-            //var decodedBpp = Encoding.UTF8.GetString(Convert.FromBase64String(value));
-            var bppGroupsList = PrivilegeGroupParser.Parse(value);
-            return PrivilegeGroupParser.ToJsonString(bppGroupsList);
+            if (name == "dk:gov:saml:attribute:Privileges_intermediate" || name == "https://data.gov.dk/model/core/eid/privilegesIntermediate")
+            {
+                //Below is the code to parse bpp value and handle the role validation process
+                //var decodedBpp = Encoding.UTF8.GetString(Convert.FromBase64String(value));
+                var bppGroupsList = PrivilegeGroupParser.Parse(value);
+                return PrivilegeGroupParser.ToJsonString(bppGroupsList);
+            }
+            
+            return value;            
         }
 
         protected static bool ValidateKombitAttributeProfile(Saml20Identity current)
         {
             if (current == null)
+            {
                 throw new ArgumentNullException("current");
+            }
+
             if (!current.HasAttribute("https://data.gov.dk/model/core/specVersion"))
+            {
                 return false;
-            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/privilegesIntermediate"))
-                return false;
+            }
+
             if (!current.HasAttribute("https://data.gov.dk/concept/core/nsis/loa"))
+            {
                 return false;
+            }
+
             if (!current.HasAttribute("https://data.gov.dk/model/core/eid/email"))
+            {
                 return false;
+            }
+
             if (!current.HasAttribute("https://data.gov.dk/model/core/eid/professional/cvr"))
+            {
                 return false;
+            }
+
             if (!current.HasAttribute("https://data.gov.dk/model/core/eid/professional/orgName"))
+            {
                 return false;
+            }
+
+            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/privilegesIntermediate"))
+            {
+                return false;
+            }
+
             if (!current.HasAttribute("dk:gov:saml:attribute:KombitSpecVer"))
+            {
                 return false;
+            }
 
             return true;
         }
