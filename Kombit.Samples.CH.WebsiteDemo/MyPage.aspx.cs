@@ -110,44 +110,21 @@ namespace Kombit.Samples.CH.WebsiteDemo
         protected static bool ValidateKombitAttributeProfile(Saml20Identity current)
         {
             if (current == null)
-            {
                 throw new ArgumentNullException("current");
-            }
-
             if (!current.HasAttribute("https://data.gov.dk/model/core/specVersion"))
-            {
                 return false;
-            }
-
-            if (!current.HasAttribute("https://data.gov.dk/concept/core/nsis/loa"))
-            {
-                return false;
-            }
-
-            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/email"))
-            {
-                return false;
-            }
-
-            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/professional/cvr"))
-            {
-                return false;
-            }
-
-            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/professional/orgName"))
-            {
-                return false;
-            }
-
             if (!current.HasAttribute("https://data.gov.dk/model/core/eid/privilegesIntermediate"))
-            {
                 return false;
-            }
-
+            if (!current.HasAttribute("https://data.gov.dk/concept/core/nsis/loa"))
+                return false;
+            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/email"))
+                return false;
+            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/professional/cvr"))
+                return false;
+            if (!current.HasAttribute("https://data.gov.dk/model/core/eid/professional/orgName"))
+                return false;
             if (!current.HasAttribute("dk:gov:saml:attribute:KombitSpecVer"))
-            {
                 return false;
-            }
 
             return true;
         }
