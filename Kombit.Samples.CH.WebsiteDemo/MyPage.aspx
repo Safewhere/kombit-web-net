@@ -5,7 +5,7 @@
     <% ValidateKombitAttributeProfile(Saml20Identity.Current);
        %>
     <% if (System.Configuration.ConfigurationManager.AppSettings["OfferAssuranceLevel"] != "true" &&
-            int.Parse(Saml20Identity.Current["dk:gov:saml:attribute:AssuranceLevel"][0].AttributeValue[0]) < 3)
+            Saml20Identity.Current["https://data.gov.dk/concept/core/nsis/loa"][0].AttributeValue[0] == "Low")
        {
            throw new Exception("Saml assertion does not have required assurance level.");
        } %>
