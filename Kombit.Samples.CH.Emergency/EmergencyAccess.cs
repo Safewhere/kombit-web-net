@@ -161,28 +161,52 @@ namespace Kombit.Samples.CH.Emergency
         }
 
         /// <summary>
-        ///     Adds the account's subject (the credential's <c>sub</c>, the SAML NameID) to the new
-        ///     passkey's labels, for example "Emergency user: admin", so passkey lists in the browser
-        ///     and Windows tell keys apart. Name and display name are labels only; they are not part
-        ///     of the attestation Identify verifies.
+        ///     When the account's subject (the credential's <c>sub</c>, the SAML NameID) is an X.509
+        ///     subject name with a Serial, for example
+        ///     "C = DK, O = 19435075, CN = idpdemouser, Serial = 555ed208-…", adds that Serial to the
+        ///     new passkey's labels ("Emergency user: 555ed208-…"), so passkey lists in the browser and
+        ///     Windows tell keys apart. Any other subject leaves Identify's labels unchanged. Name and
+        ///     display name are labels only; they are not part of the attestation Identify verifies.
         /// </summary>
         public static void LabelPasskey(JObject user, string subject)
         {
-            if (user == null || string.IsNullOrWhiteSpace(subject))
+            string serial = SubjectSerial(subject);
+            if (user == null || serial == null)
             {
                 return;
             }
-            // The full subject is kept, even a long X.509 subject name; an authenticator may still
-            // shorten what it displays.
-            string clean = new string(subject.Trim().Where(character => !char.IsControl(character)).ToArray());
             foreach (string field in new[] { "name", "displayName" })
             {
                 string label = user[field]?.Type == JTokenType.String ? (string)user[field] : null;
-                if (!string.IsNullOrWhiteSpace(label) && clean.Length > 0)
+                if (!string.IsNullOrWhiteSpace(label))
                 {
-                    user[field] = label + ": " + clean;
+                    user[field] = label + ": " + serial;
                 }
             }
+        }
+
+        /// <summary>The Serial component of an X.509 subject name, or null when there is none.</summary>
+        private static string SubjectSerial(string subject)
+        {
+            if (string.IsNullOrWhiteSpace(subject))
+            {
+                return null;
+            }
+            foreach (string part in subject.Split(','))
+            {
+                int equals = part.IndexOf('=');
+                if (
+                    equals > 0
+                    && string.Equals(part.Substring(0, equals).Trim(), "Serial", StringComparison.OrdinalIgnoreCase)
+                )
+                {
+                    string value = new string(
+                        part.Substring(equals + 1).Trim().Where(character => !char.IsControl(character)).ToArray()
+                    );
+                    return value.Length == 0 ? null : value;
+                }
+            }
+            return null;
         }
 
         public async Task<JObject> FinishRegistration(

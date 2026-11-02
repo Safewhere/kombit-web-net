@@ -265,7 +265,7 @@ namespace Kombit.Samples.CH.Emergency.Tests
         }
 
         [TestMethod]
-        public async Task BeginRegistration_LabelsThePasskeyWithTheSubject()
+        public async Task BeginRegistration_SubjectWithoutSerial_KeepsIdentifyLabels()
         {
             using (var fixture = new SamlFixture())
             {
@@ -275,20 +275,36 @@ namespace Kombit.Samples.CH.Emergency.Tests
                     CancellationToken.None
                 ))["publicKey"]["user"];
 
-                Assert.AreEqual("Emergency user: user", (string)user["name"]);
-                Assert.AreEqual("Emergency access: user", (string)user["displayName"]);
+                Assert.AreEqual("Emergency user", (string)user["name"]);
+                Assert.AreEqual("Emergency access", (string)user["displayName"]);
             }
         }
 
         [TestMethod]
-        public void LabelPasskey_KeepsTheFullSubjectWithoutControlCharacters()
+        public void LabelPasskey_X509SubjectName_AddsOnlyTheSerial()
         {
-            const string subject = "C = DK, O = 19435075, CN = idpdemouser, Serial = 555ed208-2ed1-4739-8d79-119908219319";
+            var user = new JObject { ["name"] = "Emergency user", ["displayName"] = "Emergency access" };
+
+            EmergencyAccess.LabelPasskey(user, "C = DK, O = 19435075, CN = idpdemouser, Serial = 555ed208-2ed1-4739-8d79-119908219319");
+
+            Assert.AreEqual("Emergency user: 555ed208-2ed1-4739-8d79-119908219319", (string)user["name"]);
+            Assert.AreEqual("Emergency access: 555ed208-2ed1-4739-8d79-119908219319", (string)user["displayName"]);
+        }
+
+        [DataTestMethod]
+        [DataRow("SERIAL=abc-1,CN=x", "Emergency user: abc-1")]
+        [DataRow("CN = x, Serial =  ab\nc ", "Emergency user: abc")]
+        [DataRow("admin", "Emergency user")]
+        [DataRow("C = DK, CN = idpdemouser", "Emergency user")]
+        [DataRow("C = DK, Serial = ", "Emergency user")]
+        [DataRow(null, "Emergency user")]
+        public void LabelPasskey_UsesOnlyASerialComponent(string subject, string expected)
+        {
             var user = new JObject { ["name"] = "Emergency user", ["displayName"] = JValue.CreateNull() };
 
-            EmergencyAccess.LabelPasskey(user, " " + subject.Replace("CN", "C\nN") + " ");
+            EmergencyAccess.LabelPasskey(user, subject);
 
-            Assert.AreEqual("Emergency user: " + subject, (string)user["name"]);
+            Assert.AreEqual(expected, (string)user["name"]);
             Assert.AreEqual(JTokenType.Null, user["displayName"].Type, "a missing label stays as Identify sent it");
         }
 
