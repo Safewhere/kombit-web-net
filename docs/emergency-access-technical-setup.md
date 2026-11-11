@@ -151,24 +151,7 @@ The app checks the key locally for emergency login. The information shown comes 
 
 Use the same browser profile throughout this walkthrough. The browser remembers which registered key to renew. Clearing browser data or closing an InPrivate session can remove that association. Renewal applies to one eligible key in that browser, rather than every key on the account.
 
-## 6. Verified results
-
-The November 11, 2026 development-environment walkthrough completed all three main steps with SQLite. Times below use Asia/Saigon unless marked UTC.
-
-| Check | Result |
-|---|---|
-| First startup | SQLite was created automatically and passed its integrity check. |
-| YubiKey setup | One active key was registered; its initial expiry was December 11 at 11:57:15. |
-| Emergency login | YubiKey confirmation opened the limited-access page. The session end was `2026-11-11 12:58:59Z`. |
-| Normal login and renewal | The same key's expiry advanced to December 11 at 11:59:47 without another passkey confirmation. Identify accepted the renewal request. |
-| Saved state | The final SQLite integrity check passed, and the emergency session was removed after local sign-out. |
-| Automated checks | 168 .NET tests and all six JavaScript test files passed. The web build passed. |
-
-Before this successful run, two obsolete Identify registrations for the demo user were revoked through the supported API. Both revocations were confirmed before the new YubiKey was registered.
-
-See the [emergency-login screenshot](../TestResults/visual/sqlite-emergency-success.jpg), [renewal screenshot](../TestResults/visual/sqlite-renewal-success.jpg) and [verification record](emergency-access-verification.md) for supporting evidence and broader test coverage.
-
-## 7. Common problems
+## 6. Common problems
 
 | Problem | What to check |
 |---|---|
