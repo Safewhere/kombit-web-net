@@ -91,6 +91,12 @@ namespace Kombit.Samples.CH.WebsiteDemo.EmergencyFeature
         {
             if (Enabled)
             {
+                try { Ready(); }
+                catch (Exception exception)
+                {
+                    // A storage fault disables emergency operations, not normal SAML login.
+                    EmergencyDiagnostics.Log(null, 503, "emergency_start_failed", exception);
+                }
                 return;
             }
             string directory = ConfigurationManager.AppSettings[

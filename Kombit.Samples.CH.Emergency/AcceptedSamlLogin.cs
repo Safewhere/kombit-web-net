@@ -16,6 +16,8 @@ namespace Kombit.Samples.CH.Emergency
         public long RecordExpires { get; set; }
         public long SessionExpires { get; set; }
         public bool Reserved { get; set; }
+        // Transient, scoped to this accepted login, like the one-use preparation record.
+        internal JObject AutomaticRenewal { get; set; }
         public string AccountKey
         {
             get { return Account(Issuer, Subject, Format, NameQualifier, SpNameQualifier); }

@@ -81,22 +81,29 @@
     </script>
     <% if (Saml20Identity.IsInitialized())
         { %>
-    <div class="div-claim">
-        <div class="div-metadata-mypage-title">
-            <span class="title"><b>My page:</b></span>
+    <div class="portal-home">
+        <div class="portal-welcome"><h1>Welcome back</h1><p>Your KOMBIT workspace</p></div>
+        <div class="portal-dashboard">
+            <section class="portal-panel"><h2>Your access</h2>
+                <div class="portal-access-row"><div><strong>Login &amp; emergency access</strong><p>Manage the passkeys that keep you connected.</p></div><a class="portal-action" href="<%: ResolveUrl("~/Emergency.aspx") %>">Manage</a></div>
+                <div class="portal-access-row"><div><strong>Your account</strong><p>View the details from your organisation's login.</p></div><a class="portal-action" href="#account-details">View details</a></div>
+            </section>
+            <section class="portal-panel portal-access-level"><span class="portal-status">Signed in</span><h2>Full access</h2><p>You are logged in with your organisation's normal login.</p><p class="portal-muted">Emergency access is your alternative when normal login is unavailable.</p></section>
         </div>
-        <b>WELCOME, <%= Saml20Identity.Current.Name %></b>
         <% if (EmergencyAvailable)
             { %>
         <section id="emergency-setup" class="login-card login-card-alt emergency-setup" aria-labelledby="emergency-setup-title"
             data-api="<%: ResolveUrl("~/EmergencyApi.ashx") %>" data-csrf="<%: EmergencyCsrf %>" data-authenticator="<%: Kombit.Samples.CH.WebsiteDemo.EmergencyFeature.EmergencyWeb.Authenticator %>"
             data-manage="<%: ResolveUrl("~/Emergency.aspx") %>" data-login="<%: ResolveUrl("~/login.ashx") + "?ReturnUrl=" + HttpUtility.UrlEncode(ResolveUrl("~/MyPage.aspx")) %>">
-            <h2 id="emergency-setup-title" class="login-card-title">Emergency access</h2>
+            <h2 id="emergency-setup-title" class="login-card-title">Set up emergency access for login</h2>
             <p id="emergency-setup-text" class="login-card-text">Checking emergency access for this browser...</p>
             <div id="emergency-setup-actions" class="emergency-setup-actions"></div>
             <p id="emergency-setup-status" class="login-alt-status" role="status" aria-live="polite" hidden="hidden"></p>
         </section>
         <% } %>
+        <details id="account-details" class="portal-diagnostics">
+        <summary>Account details &amp; technical tools</summary>
+        <p class="portal-account-name"><%: Saml20Identity.Current.Name %></p>
         <table>
             <thead>
                 <tr>
@@ -153,6 +160,7 @@
             <hr style="border-top: dotted; border-width: 1px;" />
             <% } %>
         </div>
+        </details>
     </div>
     <% } %>
     <% if (EmergencyAvailable)

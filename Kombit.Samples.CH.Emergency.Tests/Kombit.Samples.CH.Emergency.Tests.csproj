@@ -5,5 +5,6 @@
     <Reference Include="System.Web" />
     <Reference Include="log4net"><HintPath>..\External assemblies\log4net.dll</HintPath></Reference>
     <Compile Include="..\Kombit.Samples.CH.WebsiteDemo\EmergencyFeature\EmergencyDiagnostics.cs" Link="EmergencyDiagnostics.cs" />
+    <Compile Include="..\Kombit.Samples.CH.WebsiteDemo\EmergencyFeature\EmergencyReturnUrl.cs" Link="EmergencyReturnUrl.cs" />
   </ItemGroup>
 </Project>

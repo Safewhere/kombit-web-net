@@ -31,6 +31,12 @@ namespace Kombit.Samples.CH.Emergency.Tests
         public string Trust { get; private set; }
         public bool Offline { get; set; }
         public int Calls { get; private set; }
+        public Task RenewalBarrier { get; set; }
+        public void SelectKey(string binding, string credentialId)
+        {
+            Binding = binding;
+            CredentialId = credentialId;
+        }
         private readonly RSA encryption = new RSACryptoServiceProvider(2048);
         private readonly RSA rsa = new RSACryptoServiceProvider(2048);
         private readonly ECDsaCng elliptic = new ECDsaCng(ECCurve.NamedCurves.nistP256);
@@ -111,6 +117,21 @@ namespace Kombit.Samples.CH.Emergency.Tests
                 data => ProtectedData.Unprotect(data, entropy, DataProtectionScope.CurrentUser),
                 Reader
             );
+        }
+
+        public Microsoft.Data.Sqlite.SqliteConnection LockDatabase()
+        {
+            var connection = new Microsoft.Data.Sqlite.SqliteConnection(
+                new Microsoft.Data.Sqlite.SqliteConnectionStringBuilder {
+                    DataSource = Path.Combine(Settings.StateDirectory, "emergency.db"), Pooling = false
+                }.ToString());
+            connection.Open();
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = "BEGIN IMMEDIATE";
+                command.ExecuteNonQuery();
+            }
+            return connection;
         }
 
         public void Restart()
@@ -487,6 +508,8 @@ namespace Kombit.Samples.CH.Emergency.Tests
             if (Offline)
                 throw new HttpRequestException("Synthetic offline fixture.");
             string path = request.RequestUri.AbsolutePath;
+            if (path.EndsWith("renewals", StringComparison.Ordinal) && RenewalBarrier != null)
+                await RenewalBarrier;
             JObject body =
                 request.Content == null
                     ? null

@@ -9,6 +9,10 @@
     <RootNamespace>Kombit.Samples.CH.Emergency</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.5" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.12" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" GeneratePathProperty="true" />
+    <Content Include="$(PkgSQLitePCLRaw_lib_e_sqlite3)\runtimes\win-x64\native\e_sqlite3.dll" Link="e_sqlite3.dll" CopyToOutputDirectory="PreserveNewest" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Security" />
     <PackageReference Include="libsodium" Version="1.0.18" GeneratePathProperty="true" />

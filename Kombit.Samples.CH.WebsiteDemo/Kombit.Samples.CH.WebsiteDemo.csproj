@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -443,6 +443,12 @@ xcopy /E /I /D /Q /Y "$(ProjectDir)EmergencyAssets" "$(SolutionDir)Deployment\Ko
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Emergency.aspx" />
+    <Content Include="EmergencyComplete.aspx" />
+    <Content Include="EmergencyAssets\completion.js" />
+    <Content Include="EmergencyAssets\scenarios.js" />
+    <Content Include="EmergencyAssets\portal.css" />
+    <Compile Include="EmergencyFeature\EmergencyCompletionPage.cs" />
+    <Compile Include="EmergencyFeature\EmergencyReturnUrl.cs" />
     <Content Include="Emergency.Master" />
     <Content Include="EmergencyApi.ashx" />
     <Content Include="EmergencyAssets\emergency.css" />
@@ -463,4 +469,12 @@ xcopy /E /I /D /Q /Y "$(ProjectDir)EmergencyAssets" "$(SolutionDir)Deployment\Ko
       <Name>Kombit.Samples.CH.Emergency</Name>
     </ProjectReference>
   </ItemGroup>
+  <Target Name="CopySqliteRuntime" AfterTargets="Build">
+    <ItemGroup>
+      <SqliteRuntime Include="..\Kombit.Samples.CH.Emergency\bin\$(Configuration)\net48\win-x64\SQLitePCLRaw.*.dll" />
+      <SqliteRuntime Include="..\Kombit.Samples.CH.Emergency\bin\$(Configuration)\net48\win-x64\Microsoft.Data.Sqlite.dll" />
+      <SqliteRuntime Include="..\Kombit.Samples.CH.Emergency\bin\$(Configuration)\net48\win-x64\e_sqlite3.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SqliteRuntime)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

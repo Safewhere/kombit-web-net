@@ -7,17 +7,22 @@
     // passkey identifies the key at login. Discovery never contacts Identify or prompts for a key.
     const card = document.getElementById('emergency-login-option');
     if (!card) return;
+    const actions = document.getElementById('emergency-login-actions');
+    const status = document.getElementById('emergency-login-status');
     // With a single (or default) IdP the page is shown only to offer emergency login. When this
     // browser has no active key, continue to that IdP as if the page had never been shown.
     const proceed = () => {
+        if (window.EmergencyDemo && window.EmergencyDemo.outage()) {
+            card.hidden = false;
+            show('DEMO: normal login is unavailable in this scenario. No usable emergency key was found in this browser, or readiness could not be checked. Exit the scenario to sign in normally.', 'error');
+            return;
+        }
         if (card.dataset.continue) location.replace(card.dataset.continue);
     };
     if (!window.PublicKeyCredential || !window.fetch) {
         proceed();
         return;
     }
-    const actions = document.getElementById('emergency-login-actions');
-    const status = document.getElementById('emergency-login-status');
 
     const messages = {
         credential_unavailable: 'This passkey is not an active emergency key. Set up emergency access again after a normal login.',
@@ -175,13 +180,11 @@
     // Binding IDs of the active keys set up in this browser; stale marker entries are dropped.
     let activeBindings = [];
     async function hasActiveKey() {
-        const now = Date.now();
         const stale = [];
         activeBindings = [];
         for (const item of readMarker()) {
-            if (typeof item.expires_at === 'number' && item.expires_at * 1000 <= now) {
-                stale.push(item.binding_id);
-            } else if (await isActive(item.binding_id)) {
+            // Another browser may have renewed this binding since this marker was saved.
+            if (await isActive(item.binding_id)) {
                 activeBindings.push(item.binding_id);
             } else {
                 stale.push(item.binding_id);
@@ -234,6 +237,7 @@
                 },
             },
         });
+        if (window.EmergencyDemo) window.EmergencyDemo.authenticated();
         location.assign(result.redirect);
     }
     function button(label) {

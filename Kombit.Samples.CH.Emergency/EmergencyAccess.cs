@@ -303,6 +303,63 @@ namespace Kombit.Samples.CH.Emergency
             return issued;
         }
 
+        public async Task<JObject> RenewAfterLogin(string handle, string browser,
+            IEnumerable<string> markedBindings, CancellationToken cancellation)
+        {
+            AcceptedSamlLogin login;
+            string binding;
+            lock (state.SyncRoot)
+            {
+                login = Login(handle, browser, false);
+                if (login.AutomaticRenewal != null)
+                    return (JObject)login.AutomaticRenewal.DeepClone();
+                var marked = new HashSet<string>(markedBindings ?? Enumerable.Empty<string>(), StringComparer.Ordinal);
+                binding = state.Inspect(data => ((JObject)data["credentials"]).Properties()
+                    .Select(property => (JObject)property.Value)
+                    .Where(entry => marked.Contains((string)entry["binding"])
+                        && (string)entry["account"] == login.AccountKey
+                        && (string)entry["status"] == "active" && (long)entry["expires"] > Now
+                        && data["keys"][(string)entry["binding"]] != null
+                        && !(bool)data["keys"][(string)entry["binding"]]["blocked"])
+                    .OrderByDescending(entry => (long)entry["issued"])
+                    .ThenBy(entry => (string)entry["binding"], StringComparer.Ordinal)
+                    .Select(entry => (string)entry["binding"]).FirstOrDefault());
+                if (binding == null || login.Reserved || login.RecordExpires <= Now)
+                {
+                    login.AutomaticRenewal = new JObject { ["outcome"] = "skipped" };
+                    return (JObject)login.AutomaticRenewal.DeepClone();
+                }
+                // Selection and reservation share the same lock. A widget/enrollment or another
+                // completion request cannot consume this login while the issuer is running.
+                Login(handle, browser, true);
+                login.AutomaticRenewal = new JObject { ["outcome"] = "pending" };
+            }
+            try
+            {
+                JObject issued = await issuer.Request(HttpMethod.Post, "emergency/renewals",
+                    new JObject { ["normal_token_reference"] = login.Reference(), ["binding_id"] = binding },
+                    cancellation).ConfigureAwait(false);
+                RegisterPending(issued, login, binding, null);
+                ActivateStored(browser, Wire.String(issued, "emergency_credential", 65536), handle);
+                lock (state.SyncRoot)
+                {
+                    login.AutomaticRenewal = new JObject { ["outcome"] = "renewed", ["ready"] = true,
+                        ["binding_id"] = issued["binding_id"], ["ec_id"] = issued["ec_id"],
+                        ["expires_at"] = issued["expires_at"] };
+                    return (JObject)login.AutomaticRenewal.DeepClone();
+                }
+            }
+            catch
+            {
+                // Do not retry an ambiguous response. RegisterPending/ActivateStored use atomic
+                // registry writes, preserving the previous durable active credential. A storage
+                // fault retains the registry's existing fail-closed policy until recovery.
+                lock (state.SyncRoot)
+                    login.AutomaticRenewal = new JObject { ["outcome"] = "failed" };
+                throw;
+            }
+        }
+
         private void RegisterPending(
             JObject issued,
             AcceptedSamlLogin login,
@@ -927,6 +984,7 @@ namespace Kombit.Samples.CH.Emergency
                 return state.Inspect(data => new JObject
                 {
                     ["can_prepare"] = !login.Reserved && login.RecordExpires > Now,
+                    ["renewal"] = login.AutomaticRenewal?.DeepClone(),
                     ["credentials"] = new JArray(
                         ((JObject)data["credentials"])
                             .Properties()
@@ -943,7 +1001,7 @@ namespace Kombit.Samples.CH.Emergency
                                     : (long)item["expires"] <= Now ? "expired"
                                     : (string)item["status"],
                                 ["renew_soon"] = (long)item["expires"] < Now + 259200,
-                                // Half the credential lifetime has passed: renew silently after a normal login.
+                                // Legacy informational field; automatic renewal no longer uses this schedule.
                                 ["renew_due"] =
                                     2 * Now >= (long)item["issued"] + (long)item["expires"],
                             })

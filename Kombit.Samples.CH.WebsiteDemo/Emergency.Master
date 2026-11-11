@@ -1,4 +1,4 @@
-<%@ Master Language="C#" %>
+﻿<%@ Master Language="C#" %>
 <%@ Import Namespace="Kombit.Samples.CH.WebsiteDemo.EmergencyFeature" %>
 <%@ Import Namespace="System.Security.Claims" %>
 <%@ Import Namespace="System" %>
@@ -7,15 +7,17 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light dark" />
-    <title>Emergency access &#8212; SAML sample</title>
+    <meta name="color-scheme" content="light" />
+    <title>Emergency access &#8212; KOMBIT</title>
     <link rel="stylesheet" href="<%= Kombit.Samples.CH.WebsiteDemo.AssetVersion.Url("~/EmergencyAssets/emergency.css") %>" />
+    <link rel="stylesheet" href="<%: Kombit.Samples.CH.WebsiteDemo.AssetVersion.Url("~/EmergencyAssets/portal.css") %>" />
+    <script id="demo-scenarios-script" src="<%: Kombit.Samples.CH.WebsiteDemo.AssetVersion.Url("~/EmergencyAssets/scenarios.js") %>" data-root="<%: ResolveUrl("~/") %>"></script>
 </head>
-<body>
+<body class="kombit-emergency">
 <% EmergencyPage view = (EmergencyPage)Page; %>
 <header class="topbar">
     <div class="topbar-inner">
-        <a class="brand" href="<%= ResolveUrl("~/Default.aspx") %>"><span class="brand-mark" aria-hidden="true">!</span>SAML sample</a>
+        <a class="brand" href="<%= ResolveUrl("~/Default.aspx") %>"><img src="<%: ResolveUrl("~/images/kombit.png") %>" alt="KOMBIT" /></a>
         <nav aria-label="Emergency access">
             <a href="<%= ResolveUrl("~/Default.aspx") %>">Normal application</a>
             <a href="<%= ResolveUrl("~/Emergency.aspx") %>" <% if (view.Mode == "prepare") { %>aria-current="page"<% } %>>Manage keys</a>
@@ -24,6 +26,7 @@
 </header>
 <main id="saml-emergency" data-api="<%= ResolveUrl("~/EmergencyApi.ashx") %>" data-mode="<%: view.Mode %>">
     <div class="page-head">
+        <span class="eyebrow">YOUR ACCESS, PREPARED</span>
         <h1>Emergency access</h1>
         <p class="notice"><strong>Proof of concept.</strong> Emergency access uses local key verification. It does not provide normal NSIS assurance.</p>
     </div>
@@ -31,38 +34,49 @@
     <p id="status" role="status" aria-live="polite"></p>
 
 <% if (view.Mode == "prepare") { %>
-    <section class="card">
-        <h2>Emergency keys</h2>
-        <p class="lead">Set up and renew emergency access on My Page after a normal login: it takes one security key or passkey prompt, and renewal is automatic. Use this page to review or remove keys registered for your account.</p>
-        <div class="actions">
-            <a class="button secondary" href="<%= ResolveUrl("~/MyPage.aspx") %>#emergency-setup">Go to My Page</a>
-        </div>
+    <section class="settings-launch"><h2>Your login settings</h2><p>Manage the keys that keep your access ready.</p><button id="open-settings" type="button">Open settings</button></section>
+    <dialog id="key-settings" class="key-settings" aria-labelledby="settings-title">
+    <a class="settings-close" aria-label="Close settings" href="<%= ResolveUrl("~/MyPage.aspx") %>">&#215;</a>
+    <div class="settings-layout">
+    <aside class="settings-nav" aria-label="Settings"><h2 id="settings-title">Settings</h2><span class="eyebrow">PREFERENCES</span><a href="#saved-keys" aria-current="page"><span class="key-symbol" aria-hidden="true"></span> Login</a></aside>
+    <div class="settings-content">
+    <section class="settings-intro">
+        <h2>Login</h2>
+        <p>How you log in to KOMBIT, and how to keep access when normal login is unavailable.</p>
+        <h3>Login method</h3>
+        <div class="login-method"><div><strong>Your organisation's login</strong><span id="login-method-status">Checking your session...</span></div></div>
     </section>
-    <section class="card">
-        <h2>Keys registered for your account</h2>
-        <p class="hint">Emergency login uses the passkey itself; this browser stores no emergency credential. Removing a key ends its emergency sessions everywhere.</p>
+    <section class="settings-keys">
+        <h3>Emergency access</h3>
+        <p class="hint">Prepare access in the browsers you use, so you can sign in when normal login is unavailable.</p>
+        <p id="settings-status" role="status" aria-live="polite"></p>
         <ul id="saved-keys" class="key-list"><li class="empty">Loading keys&#8230;</li></ul>
+        <p class="hint">Normal login automatically refreshes one eligible key set up in this browser. Removing a key ends its emergency sessions everywhere.</p>
+        <a class="button secondary" href="<%= ResolveUrl("~/MyPage.aspx") %>#emergency-setup">Go to emergency setup</a>
    </section>
+    </div></div>
+    </dialog>
 
 <% } else if (view.Mode == "home") { %>
-    <section class="card">
+    <section class="card session-banner">
         <div class="card-head">
-            <h2>Emergency session</h2>
+            <h2>You are using emergency access</h2>
             <button id="exit" class="secondary" type="button">Sign out locally</button>
         </div>
         <dl class="stats">
             <div><dt>Session ends</dt><dd><%: DateTimeOffset.FromUnixTimeSeconds(long.Parse(view.EmergencyUser.FindFirst("emergency_expiry").Value)).ToString("u") %></dd></div>
         </dl>
-        <p class="hint">Normal SAML logout, reauthentication, STS token exchange, and token-based service calls are unavailable.</p>
+        <p>You can view the details saved from your last normal login. Some features are unavailable in this session.</p>
     </section>
-    <section class="card">
-        <h3>Permitted claims</h3>
+    <section class="card access-level"><span class="eyebrow">YOUR SESSION</span><h2>Limited access</h2><p>Your emergency session lasts up to eight hours. Sign in normally when your organisation's login is available again.</p><details><summary>Unavailable features</summary><p>Normal SAML logout, reauthentication, STS token exchange, and token-based service calls are unavailable.</p></details></section>
+    <details class="card">
+        <summary>Claims from your last normal login</summary>
         <dl class="claims"><% foreach (Claim claim in view.EmergencyUser.Claims) { if (claim.Type != "emergency_session") { %>
             <div><dt><%: claim.Type %></dt><dd><%: claim.Value %></dd></div><% } } %>
         </dl>
-    </section>
-    <section class="card">
-        <h3>Emergency credential (decrypted)</h3>
+    </details>
+    <details class="card">
+        <summary>Passticket details (decrypted)</summary>
         <p class="hint">The emergency credential (EC) behind this session, as Identify issued it: decrypted with this site's private key and verified against Identify's signing key when it was issued. It is kept only in this site's MachineKey-protected registry; the browser never receives it.</p>
         <% if (view.SessionCredential != null) { %>
         <dl class="stats">
@@ -76,11 +90,11 @@
         <% if (view.RawCredentialJson != null) { %>
         <pre class="raw-json"><code><%: view.RawCredentialJson %></code></pre>
         <% } else { %>
-        <p class="notice">This credential was issued before the site kept a decrypted copy. It is shown here for credentials issued or renewed from now on: renewal happens automatically after a normal login once half its lifetime has passed, or remove the key under Manage keys and set it up again.</p>
+        <p class="notice">This credential was issued before the site kept a decrypted copy. It is shown here for credentials issued or renewed from now on: renewal happens automatically after each fresh normal login for one eligible key associated with this browser, or remove the key under Manage keys and set it up again.</p>
         <% } %>
-    </section>
-    <section class="card how-it-works">
-        <h3>How emergency login works</h3>
+    </details>
+    <details class="card how-it-works">
+        <summary>How emergency login works</summary>
         <p class="lead">Emergency login lets a user who signed in normally before keep working while the identity provider (IdP) or Identify (CH2) is unavailable. It rests on a passkey (WebAuthn) and on a credential Identify signed during an earlier normal login.</p>
 
         <h4>1. Normal login: Identify keeps a claims record</h4>
@@ -124,11 +138,11 @@
 
         <h4>6. Renewal, removal and revocation</h4>
         <ul>
-            <li>Credentials last 30 days. After a normal login, once half the lifetime has passed, the site renews the credential in the background with Identify: same passkey, fresh claims, no prompt.</li>
+            <li>Credentials last 30 days. After each fresh normal login, the site renews one eligible key associated with this browser and account with Identify: same passkey, fresh claims, no extra prompt.</li>
             <li>Removing a key deletes its registry entries and sessions and reports the revocation to Identify; if Identify is unavailable, the report is queued and retried.</li>
             <li>When key status loads after a normal login, the site synchronizes with Identify at most every ten minutes: it refreshes the trusted signing keys and applies central revocations. A revocation the site has not yet received cannot block an offline emergency login.</li>
         </ul>
-    </section>
+    </details>
 
 <% } else { %>
     <section class="card">
@@ -136,7 +150,7 @@
         <p>Your emergency session expired or was ended. Sign in again to continue; the sign-in page offers emergency login when this browser has an active key.</p>
         <div class="actions">
             <a class="button primary" href="<%= ResolveUrl("~/login.ashx") %>">Sign in again</a>
-            <a class="button secondary" href="<%= ResolveUrl("~/Default.aspx") %>">Normal application</a>
+            <a class="button secondary" href="<%= ResolveUrl("~/MyPage.aspx") %>">Normal login</a>
         </div>
     </section>
 <% } %>

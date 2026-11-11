@@ -59,6 +59,20 @@ namespace Kombit.Samples.CH.WebsiteDemo
 
         protected void Application_Error(object sender, EventArgs e) { }
 
+        protected void Application_EndRequest(object sender, EventArgs e)
+        {
+            // Run after OIOSAML's redirect action has selected the normal return destination.
+            // No issuer calls or async work run inside the SAML callback.
+            if (Context.Items["EmergencyLoginCaptured"] is bool
+                && (Response.StatusCode == 302 || Response.StatusCode == 303))
+            {
+                string target = EmergencyFeature.EmergencyReturnUrl.LocalReturnUrl(
+                    Response.RedirectLocation, Request.Url, Request.ApplicationPath);
+                Response.RedirectLocation = VirtualPathUtility.ToAbsolute("~/EmergencyComplete.aspx")
+                    + "?returnUrl=" + Uri.EscapeDataString(target);
+            }
+        }
+
         protected void Session_End(object sender, EventArgs e) { }
 
         protected void Application_End(object sender, EventArgs e)

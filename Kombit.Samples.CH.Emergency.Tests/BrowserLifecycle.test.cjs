@@ -35,6 +35,7 @@ async function run(scenario) {
     const credentials = [
         { binding_id: 'binding-aaaaaa', ec_id: 'old', expires_at: 1900000000, status: 'replaced' },
         { binding_id: 'binding-aaaaaa', ec_id: 'new', expires_at: 2000000000, status: 'active', renew_soon: false },
+        { binding_id: 'binding-aaaaaa', ec_id: 'failed-renewal', expires_at: 2100000000, status: 'pending', renew_soon: false },
         { binding_id: 'binding-bbbbbb', ec_id: 'other', expires_at: 2000000000, status: 'active', renew_soon: false },
     ];
     let state = { can_prepare: true, credentials: scenario === 'empty' ? [] : credentials.slice() };
@@ -68,11 +69,13 @@ async function run(scenario) {
 
 (async () => {
     let r = await run('present');
-    let rows = r.container.children;
+    let rows = r.container.children.filter(row => row.className === 'key');
     assert.equal(rows.length, 2, 'one row per key, newest credential only');
     let texts = flatten(r.container).map(n => n.textContent);
     assert.equal(texts.filter(t => t === 'This browser').length, 1, 'only the key set up here is marked');
     assert(!texts.includes('Replaced'), 'older credentials of a key are not listed');
+    assert(!texts.includes('Not activated'), 'failed pending replacement must not hide the still-active credential');
+    assert(texts.includes('Set up in this browser') && texts.includes('Other registered keys'));
     const buttons = flatten(r.container).filter(n => n.tag === 'button');
     assert.deepEqual(buttons.map(b => b.textContent), ['Remove key', 'Remove key']);
     console.log('manage keys: list passed');
@@ -81,7 +84,7 @@ async function run(scenario) {
     await flatten(r.container).filter(n => n.tag === 'button')[0].fn();
     assert.equal(r.calls.find(c => c[0] === 'remove')[1].binding_id, 'binding-aaaaaa');
     assert.equal(r.local.getItem('saml-emergency-login-v1'), null, 'removing the key clears this browser\'s marker');
-    assert.equal(r.container.children.length, 1);
+    assert.equal(r.container.children.filter(row => row.className === 'key').length, 1);
     console.log('manage keys: remove passed');
 
     r = await run('failed-remove');

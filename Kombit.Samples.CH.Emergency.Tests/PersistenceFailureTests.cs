@@ -12,17 +12,10 @@ namespace Kombit.Samples.CH.Emergency.Tests
             // Arrange
             using (SamlFixture fixture = new SamlFixture())
             {
-                using (
-                    FileStream held = new FileStream(
-                        Path.Combine(fixture.Settings.StateDirectory, "registry.bin"),
-                        FileMode.Open,
-                        FileAccess.Read,
-                        FileShare.Read
-                    )
-                )
+                using (var held = fixture.LockDatabase())
                 {
                     // Act
-                    Assert.ThrowsExactly<IOException>(() =>
+                    Assert.ThrowsExactly<Microsoft.Data.Sqlite.SqliteException>(() =>
                         fixture.Access.EndSession(Wire.RandomId())
                     );
                     // Assert

@@ -14,6 +14,9 @@ function element() {
         hidden: true, disabled: false, dataset: {}, textContent: '', children: [], listeners: {}, className: '',
         replaceChildren(...c) { this.children = c; },
         addEventListener(name, fn) { this.listeners[name] = fn; },
+        append(...c) { this.children.push(...c); },
+        setAttribute(name, value) { this[name] = value; },
+        showModal() { this.open = true; }, close() { this.open = false; }, focus() { this.focused = true; }, isConnected: true,
     };
 }
 
@@ -26,11 +29,12 @@ async function run({ credentials, renewDue = false }) {
     const card = element();
     card.dataset = { api: '/EmergencyApi.ashx', csrf: 'token', authenticator: 'platform', manage: '/Emergency.aspx', login: '/login.ashx' };
     const nodes = { 'emergency-setup': card, 'emergency-setup-text': element(), 'emergency-setup-actions': element(), 'emergency-setup-status': element() };
+    const body = element();
     const requests = [], creates = [];
     const local = storage();
     let current = credentials.slice();
     const ctx = {
-        document: { getElementById: id => nodes[id] || null, createElement: () => element() },
+        document: { body, getElementById: id => nodes[id] || null, createElement: () => element() },
         localStorage: local,
         indexedDB: {
             deleteDatabase: name => requests.push({ op: 'deleteDatabase', body: name }),
@@ -69,7 +73,7 @@ async function run({ credentials, renewDue = false }) {
     vm.createContext(ctx);
     vm.runInContext(source, ctx);
     await new Promise(resolve => setTimeout(resolve, 30));
-    return { card, nodes, requests, creates, local };
+    return { card, nodes, requests, creates, local, body };
 }
 
 (async () => {
@@ -78,6 +82,21 @@ async function run({ credentials, renewDue = false }) {
     assert.equal(r.card.dataset.state, 'setup');
     assert(!r.requests.some(q => q.op === 'deleteDatabase'), 'no old database: nothing to delete');
     await r.nodes['emergency-setup-actions'].children[0].listeners.click();
+    assert.equal(r.creates.length, 0, 'opening the dialog must not enroll');
+    const [dialog, dock] = r.body.children;
+    const flatten = item => [item, ...item.children.flatMap(flatten)];
+    const next = flatten(dialog).find(item => item.className === 'dialog-primary');
+    await next.listeners.click(); // Explanation -> key location.
+    assert.equal(r.creates.length, 0, 'reading key location must not enroll');
+    await next.listeners.click(); // Key location -> confirmation.
+    assert.equal(r.creates.length, 0, 'reading instructions must not enroll');
+    dialog.listeners.cancel({ preventDefault() {} });
+    assert.equal(dialog.open, false);
+    assert.equal(dock.hidden, false);
+    await dock.listeners.click();
+    assert.equal(dialog.open, true);
+    assert.equal(next.focused, true);
+    await Promise.all([next.listeners.click(), next.listeners.click()]);
     assert.equal(r.creates.length, 1, 'one registration prompt');
     assert.equal(r.creates[0].authenticatorSelection.residentKey, 'required');
     assert.equal(r.creates[0].authenticatorSelection.requireResidentKey, true);
@@ -94,12 +113,12 @@ async function run({ credentials, renewDue = false }) {
     // A key set up in another browser: offer setup here too.
     r = await run({ credentials: [{ binding_id: 'elsewhere', ec_id: 'x', expires_at: 2000000000, status: 'active', renew_due: false }] });
     assert.equal(r.card.dataset.state, 'setup');
-    assert.match(r.nodes['emergency-setup-text'].textContent, /another browser or device/);
+    assert.match(r.nodes['emergency-setup-text'].textContent, /already has an emergency key/);
     console.log('setup.js: key elsewhere passed');
 
-    // A due key is renewed silently, without any WebAuthn prompt.
+    // Widgets must not compete with the post-login renewal flow.
     r = await run({ credentials: [{ binding_id: 'old-binding', ec_id: 'ec1', expires_at: 1900000000, status: 'active', renew_due: true }] });
     assert.equal(r.creates.length, 0, 'no prompt for renewal');
-    assert.equal(r.requests.find(q => q.op === 'renew').body.binding_id, 'old-binding');
-    console.log('setup.js: silent renewal passed');
+    assert(!r.requests.some(q => q.op === 'renew' || q.op === 'renew-after-login'));
+    console.log('setup.js: renewal remains owned by completion passed');
 })().catch(e => { console.error(e); process.exitCode = 1; });

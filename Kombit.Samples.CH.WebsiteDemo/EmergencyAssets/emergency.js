@@ -4,7 +4,7 @@
     if (!page) return;
     const token = document.getElementById('csrf').value;
     const show = (text, tone) => {
-        const status = document.getElementById('status');
+        const status = document.getElementById('settings-status') || document.getElementById('status');
         status.dataset.tone = tone || 'info';
         status.textContent = text;
     };
@@ -152,7 +152,7 @@
             if (event) event.preventDefault();
             try {
                 show('Working\u2026', 'busy');
-                const status = document.getElementById('status');
+                const status = document.getElementById('settings-status') || document.getElementById('status');
                 await operation();
                 if (status.dataset.tone === 'busy') show('');
             } catch (error) {
@@ -232,21 +232,35 @@
     async function displayKeys() {
         const list = document.getElementById('saved-keys');
         if (!list) return;
-        const state = page.dataset.mode === 'prepare' ? await send('status') : null;
+        let state;
+        try { state = page.dataset.mode === 'prepare' ? await send('status') : null; }
+        catch (error) {
+            list.replaceChildren(element('li', 'empty', 'Keys could not be loaded. Sign in normally and try again.'));
+            const session = document.getElementById('login-method-status');
+            if (session) session.textContent = 'Normal sign-in is required to manage keys.';
+            throw error;
+        }
+        const session = document.getElementById('login-method-status');
+        if (session && state) session.textContent = 'Signed in normally · Full access';
         list.replaceChildren();
         if (!state) return;
         // Keys belong to the account on the server; show each key's newest credential.
         const newest = new Map();
         for (const item of state.credentials || []) {
             const current = newest.get(item.binding_id);
-            if (!current || item.expires_at > current.expires_at) newest.set(item.binding_id, item);
+            if (!current || (item.status === 'active' && current.status !== 'active')
+                || ((item.status === 'active') === (current.status === 'active') && item.expires_at > current.expires_at))
+                newest.set(item.binding_id, item);
         }
         const here = new Set(readMarker().map(item => item.binding_id));
-        for (const entry of newest.values()) {
+        for (const local of [true, false]) {
+        const group = [...newest.values()].filter(entry => here.has(entry.binding_id) === local);
+        if (group.length) list.append(element('li', 'key-group', local ? 'Set up in this browser' : 'Other registered keys'));
+        for (const entry of group) {
             const row = element('li', 'key');
             const head = element('div', 'key-head');
             head.append(
-                element('span', 'key-name', 'Key \u2026' + entry.binding_id.slice(-6)),
+                element('span', 'key-name', local ? 'Passkey in this browser' : 'Registered passkey \u2026' + entry.binding_id.slice(-6)),
                 element('span', 'badge ' + entry.status, statusLabels[entry.status] || entry.status),
             );
             if (here.has(entry.binding_id)) head.append(element('span', 'badge active', 'This browser'));
@@ -261,8 +275,8 @@
                         new Date(entry.expires_at * 1000).toLocaleString(),
                 ),
             );
-            const id = element('span', 'key-meta', 'Binding ID: ');
-            id.append(element('code', null, entry.binding_id));
+            const id = element('details', 'key-details');
+            id.append(element('summary', null, 'Technical details'), element('span', 'key-meta', 'Binding ID'), element('code', null, entry.binding_id));
             row.append(id);
             const actions = element('div', 'actions');
             actions.append(
@@ -280,6 +294,7 @@
             row.append(actions);
             list.append(row);
         }
+        }
         if (!list.children.length)
             list.append(
                 element('li', 'empty', 'No emergency keys are registered for your account. Set one up on My Page.'),
@@ -289,5 +304,22 @@
         const result = await send('logout');
         location.assign(result.redirect);
     });
-    if (page.dataset.mode === 'prepare') action(displayKeys)();
+    if (page.dataset.mode === 'prepare') {
+        const settings = document.getElementById('key-settings');
+        const open = document.getElementById('open-settings');
+        if (settings && typeof settings.showModal === 'function') {
+            open.addEventListener('click', () => settings.showModal());
+            settings.addEventListener('close', () => open.focus());
+            settings.addEventListener('keydown', event => {
+                if (event.key !== 'Tab') return;
+                const controls = [...settings.querySelectorAll('a[href], button, summary')]
+                    .filter(item => !item.disabled && item.getClientRects().length);
+                const first = controls[0], last = controls[controls.length - 1];
+                if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+                else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+            });
+            settings.showModal();
+        } else if (settings) settings.setAttribute('open', '');
+        action(displayKeys)();
+    }
 })();

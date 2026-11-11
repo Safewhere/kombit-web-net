@@ -61,6 +61,17 @@ namespace Kombit.Samples.CH.WebsiteDemo.EmergencyFeature
                     CancellationToken cancellation = CancellationToken.None;
                     switch (operation)
                     {
+                        case "renew-after-login":
+                        {
+                            Wire.Fields(body, "binding_ids");
+                            JArray ids = body["binding_ids"] as JArray;
+                            if (ids == null || ids.Count > 10 || ids.Any(id => id.Type != JTokenType.String
+                                || string.IsNullOrEmpty((string)id) || ((string)id).Length > 128))
+                                throw Wire.Invalid();
+                            result = await access.RenewAfterLogin(EmergencyWeb.NormalHandle(context), browser,
+                                ids.Values<string>(), cancellation);
+                            break;
+                        }
                         case "enroll":
                             Wire.Fields(body);
                             result = await access.BeginRegistration(

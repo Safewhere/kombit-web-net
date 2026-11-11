@@ -64,6 +64,7 @@ namespace Kombit.Samples.CH.WebsiteDemo.EmergencyFeature
                 };
                 SessionStore.CurrentSession[EmergencyWeb.LoginHandle] =
                     EmergencyWeb.Service.RecordLogin(login);
+                context.Items["EmergencyLoginCaptured"] = true;
                 EmergencyDiagnostics.Event(context, "normal_login_captured");
             }
             catch (Exception exception)

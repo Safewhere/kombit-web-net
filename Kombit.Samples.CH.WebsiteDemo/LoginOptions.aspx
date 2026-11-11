@@ -4,13 +4,14 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <div class="login-page">
         <div class="login-intro">
-            <h1>Sign in</h1>
-            <p>Choose how you want to sign in to the demo service provider.</p>
+            <span class="eyebrow">WELCOME TO KOMBIT</span>
+            <h1>Log in</h1>
+            <p>Log in to KOMBIT with your organisation's login.</p>
         </div>
 
         <div class="login-options">
             <section class="login-card" aria-labelledby="idp-title">
-                <h2 id="idp-title" class="login-card-title">Choose Identity Provider</h2>
+                <h2 id="idp-title" class="login-card-title">Normal login</h2>
                 <p class="login-card-text">Continue with the identity provider that manages your account.</p>
                 <ul class="idp-list">
                     <% foreach (var idp in IdentityProviders)
@@ -45,11 +46,12 @@
                { %>
             <section id="emergency-login-option" class="login-card login-card-alt" aria-labelledby="alt-title" hidden="hidden"
                 data-api="<%: ResolveUrl("~/EmergencyApi.ashx") %>" data-csrf="<%: EmergencyCsrf %>" data-authenticator="<%: Kombit.Samples.CH.WebsiteDemo.EmergencyFeature.EmergencyWeb.Authenticator %>" data-continue="<%: AutoContinueUrl %>">
-                <h2 id="alt-title" class="login-card-title">Other login options</h2>
+                <span class="setup-symbol key-symbol" aria-hidden="true"></span>
+                <h2 id="alt-title" class="login-card-title">Emergency access</h2>
                 <p class="login-card-text">This browser has an emergency key. Use it only when normal sign-in through your identity provider is unavailable.</p>
                 <div id="emergency-login-actions" class="login-alt-actions"></div>
                 <p id="emergency-login-status" class="login-alt-status" role="status" aria-live="polite" hidden="hidden"></p>
-                <p class="login-card-note">You will be asked to confirm with your security key or passkey.</p>
+                <p class="login-card-note">Confirm with your passkey for limited access, for up to eight hours.</p>
             </section>
             <% } %>
         </div>

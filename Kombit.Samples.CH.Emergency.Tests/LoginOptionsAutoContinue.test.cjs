@@ -48,7 +48,7 @@ function fakeIndexedDb(entries) {
         },
     };
 }
-async function run({ continueUrl, marker, active, webauthn = true, oldCopies = null }) {
+async function run({ continueUrl, marker, active, webauthn = true, oldCopies = null, outage = false }) {
     const card = element();
     card.dataset = { api: '/EmergencyApi.ashx', csrf: 'token', authenticator: 'platform' };
     if (continueUrl) card.dataset.continue = continueUrl;
@@ -84,6 +84,7 @@ async function run({ continueUrl, marker, active, webauthn = true, oldCopies = n
         setTimeout, Date, Map, JSON, console, Array, Object, Uint8Array, atob, btoa, String, Error, URL,
     };
     ctx.window = ctx;
+    if (outage) ctx.EmergencyDemo = { outage: () => true, authenticated: () => {} };
     vm.createContext(ctx);
     vm.runInContext(source, ctx);
     await new Promise(resolve => setTimeout(resolve, 30));
@@ -94,6 +95,14 @@ async function run({ continueUrl, marker, active, webauthn = true, oldCopies = n
     const future = Math.floor(Date.now() / 1000) + 86400;
     const idp = '/login.ashx?cidp=https%3a%2f%2fidp%2f';
 
+    for (const webauthn of [true, false]) {
+        const outageResult = await run({ continueUrl: idp, marker: null, active: [], outage: true, webauthn });
+        assert.deepEqual(outageResult.replaced, [], 'simulated outage must not auto-continue to the real IdP');
+        assert.equal(outageResult.card.hidden, false);
+        assert.match(outageResult.nodes['emergency-login-status'].textContent, /DEMO/);
+        assert.equal(outageResult.gets.length, 0, 'no key prompt without an explicit action');
+    }
+
     let r = await run({ continueUrl: idp, marker: null, active: [] });
     assert.deepEqual(r.replaced, [idp], 'no marker: continue to the IdP');
     assert.equal(r.card.hidden, true);
@@ -103,7 +112,8 @@ async function run({ continueUrl, marker, active, webauthn = true, oldCopies = n
     assert.equal(r.local.getItem('saml-emergency-login-v1'), null, 'stale marker entries are dropped');
 
     r = await run({ continueUrl: idp, marker: [{ binding_id: 'b1', expires_at: 1 }], active: ['b1'] });
-    assert.deepEqual(r.replaced, [idp], 'expired marker entry: continue to the IdP');
+    assert.deepEqual(r.replaced, [], 'stale local expiry must not hide a server-renewed binding');
+    assert.equal(r.card.hidden, false);
 
     r = await run({ continueUrl: idp, marker: [{ binding_id: 'b1', expires_at: future }], active: ['b1'], webauthn: false });
     assert.deepEqual(r.replaced, [idp], 'browser without WebAuthn: continue to the IdP');

@@ -356,7 +356,7 @@ namespace Kombit.Samples.CH.Emergency.Tests
         }
 
         [TestMethod]
-        public void ProtectedStore_SecondWriterAndMissingState_Reject()
+        public void ProtectedStore_SecondWriterRejects_MissingDatabaseCreatesFreshState()
         {
             // Arrange
             using (SamlFixture fixture = new SamlFixture())
@@ -364,8 +364,9 @@ namespace Kombit.Samples.CH.Emergency.Tests
                 // Act and Assert
                 Assert.ThrowsExactly<IOException>(() => fixture.OpenStore());
                 fixture.Access.Dispose();
-                File.Delete(Path.Combine(fixture.Settings.StateDirectory, "registry.bin"));
-                Assert.ThrowsExactly<InvalidOperationException>(() => fixture.OpenStore());
+                File.Delete(Path.Combine(fixture.Settings.StateDirectory, "emergency.db"));
+                using (var store = fixture.OpenStore())
+                    Assert.AreEqual(0, store.Inspect(state => ((JObject)state["credentials"]).Count));
             }
         }
     }
