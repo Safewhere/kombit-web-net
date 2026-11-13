@@ -351,11 +351,20 @@
       <DependentUpon>sp.Master</DependentUpon>
     </Compile>
     <Compile Include="STS\Logging.cs" />
+    <Compile Include="STS\SampleAssertionBuilder.cs" />
     <Compile Include="STS\ServiceCaller.cs" />
     <Compile Include="STS\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="login.ashx" />
+    <Content Include="LoginOptions.aspx" />
+    <Compile Include="LoginOptions.aspx.cs">
+      <DependentUpon>LoginOptions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="SignonHandler.cs" />
+    <Compile Include="AssetVersion.cs" />
+    <Compile Include="ConfiguredIdentityProviders.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="metadata.ashx" />
@@ -428,6 +437,44 @@ xcopy /D /Q /Y "$(ProjectDir)*.aspx" "$(SolutionDir)Deployment\Kombit.Samples.CH
 xcopy /D /Q /Y "$(ProjectDir)*.ashx" "$(SolutionDir)Deployment\Kombit.Samples.CH.WebsiteDemo\"
 xcopy /D /Q /Y "$(ProjectDir)web.config" "$(SolutionDir)Deployment\Kombit.Samples.CH.WebsiteDemo\"
 xcopy /D /Q /Y "$(ProjectDir)sp.Master" "$(SolutionDir)Deployment\Kombit.Samples.CH.WebsiteDemo\"
-xcopy /D /Q /Y "$(ProjectDir)Web.config.nemlogin-template" "$(SolutionDir)Deployment\Kombit.Samples.CH.WebsiteDemo\"</PostBuildEvent>
+xcopy /D /Q /Y "$(ProjectDir)Web.config.nemlogin-template" "$(SolutionDir)Deployment\Kombit.Samples.CH.WebsiteDemo\"
+xcopy /D /Q /Y "$(ProjectDir)Emergency.Master" "$(SolutionDir)Deployment\Kombit.Samples.CH.WebsiteDemo\"
+xcopy /E /I /D /Q /Y "$(ProjectDir)EmergencyAssets" "$(SolutionDir)Deployment\Kombit.Samples.CH.WebsiteDemo\EmergencyAssets\"</PostBuildEvent>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Emergency.aspx" />
+    <Content Include="EmergencyComplete.aspx" />
+    <Content Include="EmergencyAssets\completion.js" />
+    <Content Include="EmergencyAssets\scenarios.js" />
+    <Content Include="EmergencyAssets\portal.css" />
+    <Compile Include="EmergencyFeature\EmergencyCompletionPage.cs" />
+    <Compile Include="EmergencyFeature\EmergencyReturnUrl.cs" />
+    <Content Include="Emergency.Master" />
+    <Content Include="EmergencyApi.ashx" />
+    <Content Include="EmergencyAssets\emergency.css" />
+    <Content Include="EmergencyAssets\emergency.js" />
+    <Content Include="EmergencyAssets\login-options.js" />
+    <Content Include="EmergencyAssets\setup.js" />
+    <Content Include="EmergencyEnded.aspx" />
+    <Compile Include="EmergencyFeature\EmergencyApi.cs" />
+    <Compile Include="EmergencyFeature\EmergencyDiagnostics.cs" />
+    <Compile Include="EmergencyFeature\EmergencyNormalLoginAction.cs" />
+    <Compile Include="EmergencyFeature\EmergencyPage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="EmergencyFeature\EmergencyWeb.cs" />
+    <Content Include="EmergencyHome.aspx" />
+    <ProjectReference Include="..\Kombit.Samples.CH.Emergency\Kombit.Samples.CH.Emergency.csproj">
+      <Project>{C5F8CA15-728D-4A02-BDBB-067EAF6DA1D9}</Project>
+      <Name>Kombit.Samples.CH.Emergency</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Target Name="CopySqliteRuntime" AfterTargets="Build">
+    <ItemGroup>
+      <SqliteRuntime Include="..\Kombit.Samples.CH.Emergency\bin\$(Configuration)\net48\win-x64\SQLitePCLRaw.*.dll" />
+      <SqliteRuntime Include="..\Kombit.Samples.CH.Emergency\bin\$(Configuration)\net48\win-x64\Microsoft.Data.Sqlite.dll" />
+      <SqliteRuntime Include="..\Kombit.Samples.CH.Emergency\bin\$(Configuration)\net48\win-x64\e_sqlite3.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SqliteRuntime)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

@@ -1,10 +1,10 @@
-﻿using dk.nsi.seal;
+using System;
+using System.ServiceModel;
+using dk.nsi.seal;
 using dk.nsi.seal.dgwstypes;
 using Kombit.Samples.CH.WebsiteDemo.NtsServiceReference;
 using static dk.nsi.seal.MessageHeaders.IdCardMessageHeader;
 using static dk.nsi.seal.MessageHeaders.XmlMessageHeader;
-using System;
-using System.ServiceModel;
 
 namespace Kombit.Samples.CH.WebsiteDemo.STS
 {
@@ -24,21 +24,31 @@ namespace Kombit.Samples.CH.WebsiteDemo.STS
         ///     Leave empty/null to skip the DNS identity check.
         /// </param>
         /// <returns>"OK" on success.</returns>
-        public static string Invoke(IdCard idCard, string serviceAddress, string endpointDnsIdentity)
+        public static string Invoke(
+            IdCard idCard,
+            string serviceAddress,
+            string endpointDnsIdentity
+        )
         {
-            if (idCard == null) throw new ArgumentNullException("idCard");
-            if (serviceAddress == null) throw new ArgumentNullException("serviceAddress");
+            if (idCard == null)
+                throw new ArgumentNullException("idCard");
+            if (serviceAddress == null)
+                throw new ArgumentNullException("serviceAddress");
 
             var serviceUri = new Uri(serviceAddress);
 
             EndpointAddress endpointAddress = string.IsNullOrEmpty(endpointDnsIdentity)
                 ? new EndpointAddress(serviceUri)
-                : new EndpointAddress(serviceUri, EndpointIdentity.CreateDnsIdentity(endpointDnsIdentity));
+                : new EndpointAddress(
+                    serviceUri,
+                    EndpointIdentity.CreateDnsIdentity(endpointDnsIdentity)
+                );
 
             // Use BasicHttpBinding (SOAP 1.1). Switch to Transport security for HTTPS endpoints.
             bool useHttps = serviceUri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase);
             var binding = new BasicHttpBinding(
-                useHttps ? BasicHttpSecurityMode.Transport : BasicHttpSecurityMode.None);
+                useHttps ? BasicHttpSecurityMode.Transport : BasicHttpSecurityMode.None
+            );
 
             // SealEndpointBehavior checks the response for DGWS fault details and
             // throws a descriptive exception when errors are found.
@@ -50,7 +60,7 @@ namespace Kombit.Samples.CH.WebsiteDemo.STS
             {
                 SecurityLevel = 4,
                 SecurityLevelSpecified = true,
-                Linking = new Linking { MessageID = Guid.NewGuid().ToString("D") }
+                Linking = new Linking { MessageID = Guid.NewGuid().ToString("D") },
             };
 
             NtsPortType channel = factory.CreateChannel();
@@ -78,8 +88,14 @@ namespace Kombit.Samples.CH.WebsiteDemo.STS
                 var comm = channel as ICommunicationObject;
                 if (comm != null)
                 {
-                    try { comm.Close(); }
-                    catch { comm.Abort(); }
+                    try
+                    {
+                        comm.Close();
+                    }
+                    catch
+                    {
+                        comm.Abort();
+                    }
                 }
             }
         }

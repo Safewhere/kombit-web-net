@@ -1,0 +1,275 @@
+/* KOMBIT portal shell and emergency dialogs, adapted to the Web Forms app.
+   Local system fonts; no CDN, framework migration, or global Bootstrap overrides. */
+.kombit-shell, .kombit-emergency {
+    color-scheme: light;
+    --bg: #faf9f4; --surface: #fff; --surface-muted: #f4efe0;
+    --text: #2e2e2e; --text-muted: #555; --border: #ddd; --border-strong: #888;
+    --accent: #eb052f; --accent-hover: #c30427; --accent-text: #fff;
+    --accent-soft: #fef3f5; --danger: #a90323; --danger-hover: #87021c;
+    --danger-soft: #fef3f5; --success: #196b43; --success-soft: #edf6f0;
+    --warning: #725100; --warning-soft: #fff8e5; --warning-border: #dec777;
+    --focus: #c30427; --radius: 12px;
+    background: #faf9f4; color: #2e2e2e;
+    font-family: 'Segoe UI', Arial, sans-serif; font-size: 16px; line-height: 1.6;
+    min-height: 100vh; height: auto;
+}
+.kombit-shell [hidden], .kombit-emergency [hidden], .emergency-dock[hidden] { display: none !important; }
+.kombit-shell .container { width: min(1200px, 100%); padding: 0 32px; }
+.kombit-shell .content { padding: 0; background: transparent; }
+.kombit-shell .header { min-height: 100px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 0; }
+.kombit-shell .header-logo { width: 165px; height: auto; margin: 0; }
+.brand-caption { color: #555; font-size: 13px; }
+.kombit-nav { background: #f4efe0; border-radius: 8px; display: flex; gap: 32px; padding: 16px 24px; margin-bottom: 40px; }
+.kombit-nav a { color: #2e2e2e; font-weight: 600; }
+.kombit-shell .footer { border-top: 1px solid #ddd; margin-top: 64px; padding: 24px 0; text-align: left; background: transparent; }
+.kombit-shell .footer-logo { width: 145px; height: auto; margin: 0; }
+.kombit-shell .div-row-btn-mypage { padding: 24px; border: 1px solid #ddd; border-radius: 12px; background: white; }
+.kombit-shell .div-metadata-mypage-title, .kombit-shell .div-metadata-download { background: #f4efe0; color: #2e2e2e; }
+.kombit-shell .login-page { max-width: 960px; margin: 64px auto 80px; }
+.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .15em; color: #637972; }
+.kombit-shell .login-intro { max-width: 650px; margin-bottom: 36px; }
+.kombit-shell .login-intro h1 { font-size: clamp(30px, 4vw, 44px); line-height: 1.15; font-weight: 750; letter-spacing: -.035em; margin: 14px 0 18px; }
+.kombit-shell .login-intro p { font-size: 17px; color: #555; }
+.kombit-shell .login-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 24px; align-items: start; }
+.kombit-shell .login-card { border: 1px solid #ddd; border-radius: 12px; padding: 30px; box-shadow: none; background: #fff; }
+.kombit-shell .login-card-alt { background: #f4f6f6; border-color: #d7e1dd; }
+.kombit-shell .login-card-title { font-size: 22px; font-weight: 650; color: #2e2e2e; margin: 8px 0 14px; }
+.kombit-shell .idp-option { padding: 16px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #2e2e2e; }
+.kombit-shell .idp-option:hover { border-color: #eb052f; background: #fef3f5; }
+.kombit-shell .idp-address { overflow-wrap: anywhere; font-size: 12px; color: #555; }
+.kombit-shell .login-alt-actions .btn, .kombit-shell #emergency-setup .btn { border-radius: 7px; padding: 10px 18px; font-weight: 600; white-space: normal; }
+.kombit-shell .login-alt-actions .btn-primary, .kombit-shell #emergency-setup .btn-primary { background: #2e2e2e; border-color: #2e2e2e; color: white; }
+.kombit-shell #emergency-setup { border: 1px solid #d7e1dd; border-radius: 12px; background: #f4f6f6; padding: 24px; }
+.kombit-shell #emergency-setup.emergency-inline { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 8px 16px; margin-left: 8px; }
+.kombit-shell #emergency-setup[data-state="ready"] { border-color: #a3c8b2; background: #edf6f0; }
+.kombit-shell :focus-visible, .kombit-emergency :focus-visible, .emergency-dialog :focus-visible { outline: 3px solid #c30427; outline-offset: 4px; }
+.kombit-emergency .topbar { background: #fff; border-bottom: 1px solid #ddd; }
+.kombit-emergency .topbar-inner { min-height: 90px; max-width: 1120px; }
+.kombit-emergency .brand { color: #2e2e2e; font-size: 24px; font-weight: 800; }
+.kombit-emergency .brand img { width: 140px; height: auto; }
+.kombit-emergency .topbar nav a { color: #2e2e2e; }
+.kombit-emergency #saml-emergency { max-width: 1060px; padding: 44px 24px 64px; }
+.kombit-emergency .page-head h1 { font-size: clamp(30px, 4vw, 42px); letter-spacing: -.035em; }
+.kombit-emergency .card { border: 1px solid #ddd; border-radius: 12px; box-shadow: none; padding: 28px; }
+.kombit-emergency .card summary { font-size: 18px; font-weight: 650; cursor: pointer; }
+.kombit-emergency .session-banner { border-left: 5px solid #637972; background: #f4f6f6; }
+.kombit-emergency .settings-layout { display: grid; grid-template-columns: 180px 1fr; gap: 28px; }
+.settings-nav { background: #f4efe0; border-radius: 10px; padding: 18px; align-self: start; }
+.settings-nav strong, .settings-nav a { display: block; margin: 6px 0; color: #2e2e2e; }
+.key-group { list-style: none; margin-top: 24px; font-size: 14px; font-weight: 700; color: #555; }
+.kombit-emergency .key { background: #fff; border-radius: 9px; padding: 20px; }
+.kombit-emergency .key-meta, .kombit-emergency .claims dd { overflow-wrap: anywhere; }
+.kombit-emergency button, .kombit-emergency .button { border-radius: 7px; }
+.kombit-emergency .completion-card { width: min(520px, calc(100% - 32px)); margin: 15vh auto; padding: 36px; border: 1px solid #ddd; border-radius: 14px; background: white; }
+.emergency-dialog { color: #303030; background: white; border: 1px solid #ddd; border-radius: 16px; width: min(460px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); overflow-y: auto; padding: 30px; box-shadow: 0 24px 80px #0003; font: 15px/1.65 'Segoe UI', Arial, sans-serif; }
+.emergency-dialog::backdrop { background: rgb(25 30 28 / 42%); backdrop-filter: blur(3px); }
+.dialog-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+.setup-symbol { display: inline-grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; background: #e9f3fb; color: #305b7b; font-size: 32px; }
+.emergency-dialog h2 { font-size: 24px; font-weight: 650; line-height: 1.3; letter-spacing: -.025em; margin: 0 0 14px; }
+.dialog-detail { color: #555; min-height: 96px; margin: 0 0 24px; }
+.dialog-status { color: #a90323; overflow-wrap: anywhere; }
+.dialog-primary, .dialog-back, .dialog-minimise { border-radius: 7px; padding: 12px 16px; cursor: pointer; font: inherit; font-weight: 600; }
+.dialog-primary { width: 100%; color: white; border: 1px solid #303030; background: #303030; }
+.dialog-primary:hover { background: #111; }
+.dialog-primary:disabled { opacity: .65; cursor: wait; }
+.dialog-back { width: 100%; margin-top: 8px; background: #fff; border: 1px solid #ddd; color: #303030; }
+.dialog-minimise { padding: 5px 8px; border: 0; background: white; color: #555; font-size: 12px; }
+.emergency-dock { position: fixed; z-index: 1000; right: 24px; bottom: 24px; max-width: calc(100% - 48px); border: 1px solid #ddd; border-radius: 12px; background: white; color: #303030; box-shadow: 0 8px 30px #0002; padding: 18px 22px; font: 600 14px/1.4 'Segoe UI', Arial, sans-serif; cursor: pointer; }
+@media (max-width: 640px) {
+    .kombit-shell .container { padding: 0 16px; }
+    .brand-caption { max-width: 145px; text-align: right; font-size: 11px; }
+    .kombit-shell .header-logo { width: 130px; }
+    .kombit-nav { margin-bottom: 24px; }
+    .kombit-shell .login-page { margin: 32px auto; }
+    .kombit-shell .login-card, .kombit-emergency .card { padding: 20px; }
+    .kombit-shell #emergency-setup.emergency-inline { display: flex; margin: 12px 0 0; }
+    .kombit-emergency .settings-layout { grid-template-columns: 1fr; }
+    .kombit-emergency .topbar-inner { flex-wrap: wrap; padding: 16px 24px; gap: 12px; }
+    .emergency-dialog { padding: 24px; }
+}
+
+/* Match the reference's compact portal, stepper sheet and settings modal. */
+.kombit-shell .header { min-height: 76px; padding: 16px 0; }
+.kombit-shell .header-logo { width: 140px; }
+.kombit-nav { background: transparent; border-bottom: 1px solid #ddd; border-radius: 0; padding: 14px 0; margin-bottom: 32px; }
+.kombit-shell .login-page { max-width: 480px; margin: 48px auto 72px; }
+.kombit-shell .login-options { grid-template-columns: 1fr; gap: 20px; }
+.kombit-shell .login-intro h1 { font-size: 32px; }
+.kombit-shell .login-card { padding: 24px; }
+.kombit-shell .login-card-alt { background: #fff; }
+.kombit-shell .login-alt-actions .btn-primary { width: 100%; background: #eb052f; border-color: #eb052f; }
+.key-symbol { display: inline-block; position: relative; width: 32px; height: 32px; background: transparent; }
+.key-symbol::before { content: ''; position: absolute; width: 44%; height: 44%; border: 2px solid currentColor; border-radius: 50%; right: 0; top: 0; }
+.key-symbol::after { content: ''; position: absolute; width: 62%; height: 24%; border-bottom: 2px solid currentColor; border-left: 2px solid currentColor; left: 4%; bottom: 20%; transform: rotate(-45deg); }
+.emergency-dialog { width: min(680px, calc(100vw - 32px)); padding: 0; border-radius: 12px; max-height: calc(100dvh - 32px); }
+.emergency-dialog[open] { display: grid; grid-template-columns: 192px minmax(0, 1fr); }
+.emergency-dialog::backdrop, .key-settings::backdrop { background: rgb(0 0 0 / 78%); backdrop-filter: none; }
+.setup-rail { margin: 24px 0 24px 24px; padding-right: 22px; border-right: 1px solid #ddd; }
+.setup-rail .eyebrow { color: #555; font-size: 10px; letter-spacing: .12em; }
+.setup-steps { list-style: none; padding: 0; margin: 20px 0; }
+.setup-steps li { position: relative; padding: 0 0 20px 24px; color: #999; line-height: 1.35; font-size: 14px; }
+.setup-steps li::before { content: ''; position: absolute; top: 6px; left: 3px; width: 7px; height: 7px; border-radius: 50%; background: #ddd; }
+.setup-steps strong, .setup-steps span { display: block; font-weight: 400; }
+.setup-steps span { font-size: 12px; margin-top: 3px; }
+.setup-steps [data-state="current"] { color: #303030; }
+.setup-steps [data-state="current"] strong { font-weight: 600; }
+.setup-steps [data-state="current"]::before { background: #303030; }
+.setup-steps [data-state="complete"]::before { background: #637972; }
+.setup-content { min-height: 366px; padding: 24px 28px; display: flex; flex-direction: column; }
+.dialog-top { margin-bottom: 20px; }
+.dialog-top .setup-symbol { width: 34px; height: 34px; border-radius: 0; color: #303030; }
+.emergency-dialog h2 { font-size: 21px; margin-bottom: 10px; }
+.setup-progress { color: #777; font-size: 12px; margin: 0 0 14px; }
+.dialog-detail { min-height: 0; font-size: 14px; line-height: 1.5; margin: 0 0 18px; }
+.setup-place { padding: 16px; border: 1px solid #333; border-radius: 8px; background: #fafafa; margin-bottom: 18px; }
+.setup-place strong, .setup-place span { display: block; }
+.setup-place span, .setup-privacy { font-size: 12px; line-height: 1.5; color: #666; }
+.setup-place strong { font-size: 14px; }
+.dialog-actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: auto; padding-top: 24px; }
+.dialog-primary, .dialog-back { width: auto; padding: 8px 16px; font-size: 14px; line-height: 1.4; margin: 0; }
+.dialog-back { border-color: transparent; margin-right: auto; }
+.dialog-minimise { font-size: 11px; font-weight: 400; padding: 4px; }
+.emergency-dock { width: 320px; text-align: left; border-radius: 8px; }
+.kombit-shell #emergency-setup { background: white; border-color: #ddd; }
+.kombit-shell #emergency-setup[data-state="ready"] { background: white; border-color: #ddd; }
+.key-settings { color: #303030; background: white; border: 1px solid #ddd; border-radius: 10px; width: min(1024px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); padding: 0; overflow: auto; font: 15px/1.5 'Segoe UI', Arial, sans-serif; }
+.key-settings .settings-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 0; min-height: min(700px, calc(100dvh - 44px)); }
+.key-settings .settings-nav { align-self: stretch; border-radius: 0; background: #faf9f6; border-right: 1px solid #ddd; padding: 24px 18px; }
+.key-settings .settings-nav h2 { font-size: 20px; margin: 0 0 32px; }
+.key-settings .settings-nav a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: white; border-radius: 6px; text-decoration: none; margin-top: 12px; }
+.key-settings .settings-nav .key-symbol { width: 19px; height: 19px; }
+.settings-content { min-width: 0; padding: 36px 32px; }
+.settings-content h2 { font-size: 24px; margin: 0 0 10px; }
+.settings-content h3 { font-size: 17px; margin: 24px 0 10px; }
+.settings-content p { color: #666; }
+.settings-close { position: absolute; right: 18px; top: 12px; font-size: 24px; line-height: 1; color: #777; padding: 4px; text-decoration: none; }
+.settings-intro { padding-bottom: 32px; border-bottom: 1px solid #ddd; }
+.login-method { display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid #ddd; padding: 16px; border-radius: 8px; }
+.login-method strong, .login-method div > span { display: block; }
+.login-method div > span { color: #666; font-size: 13px; margin-top: 4px; }
+.key-settings .key-list { padding: 0; }
+.key-settings .key { padding: 20px 24px; border: 1px solid #ddd; box-shadow: 0 1px 3px #0001; margin: 12px 0; }
+.key-settings .key-head { gap: 10px; }
+.key-settings .key-name { font-size: 16px; }
+.key-settings .badge { text-transform: none; font-size: 11px; border: 1px solid #ddd; font-weight: 500; padding: 2px 8px; }
+.key-settings .badge.active { color: #42655a; background: #f1f5f3; }
+.key-details { margin: 12px 0; font-size: 12px; color: #777; }
+.key-details summary { cursor: pointer; }
+.key-details code { display: block; white-space: normal; overflow-wrap: anywhere; }
+.key-settings .actions { justify-content: flex-end; margin: 12px 0 0; }
+.key-settings .danger { color: #b21c34; background: white; border: 1px solid #ddd; font-size: 12px; padding: 6px 10px; }
+.key-settings [data-tone="error"] { color: #a90323; }
+.key-settings [data-tone="success"] { color: #196b43; }
+.settings-launch { background: white; padding: 32px; border: 1px solid #ddd; border-radius: 10px; }
+.kombit-emergency .session-banner { border: 1px solid #e4c98d; border-radius: 8px; background: #fff8e7; padding: 20px 24px; }
+.kombit-emergency .session-banner h2 { font-size: 19px; }
+.access-level h2 { font-size: 23px; }
+@media (max-width: 700px) {
+    .key-settings .settings-layout { grid-template-columns: 1fr; min-height: 0; }
+    .key-settings .settings-nav { border-right: 0; border-bottom: 1px solid #ddd; padding: 18px 24px; }
+    .key-settings .settings-nav h2 { margin: 0 0 12px; }
+    .key-settings .settings-nav .eyebrow { display: none; }
+    .key-settings .settings-nav a { margin: 0; }
+    .settings-content { padding: 24px; }
+    .emergency-dialog[open] { grid-template-columns: 1fr; }
+    .setup-rail { display: none; }
+    .setup-content { min-height: 380px; padding: 24px; }
+    .key-settings .key { padding: 16px; }
+    .login-method { flex-wrap: wrap; }
+}
+
+
+/* Portal layout: shared proportions for the normal and emergency views. */
+.kombit-shell { margin: 0; background: #fff; font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.5; }
+.kombit-shell form { min-height: 100vh; }
+.portal-header { height: 72px; display: flex; align-items: center; gap: 16px; padding: 0 4.5%; border-bottom: 1px solid #eee; background: #faf9f4; }
+.portal-logo { display: flex; align-items: center; padding-right: 20px; border-right: 1px solid #ddd; height: 36px; }
+.portal-logo img { width: 134px; height: auto; }
+.portal-name { font-size: 18px; color: #2e2e2e; letter-spacing: -.4px; }
+.portal-prototype { font-size: 11px; background: #f4efe0; border-radius: 4px; padding: 2px 7px; color: #555; }
+.portal-settings { margin-left: auto; display: flex; align-items: center; gap: 9px; color: #333; font-size: 13px; text-decoration: none; }
+.portal-person { position: relative; width: 30px; height: 30px; border-radius: 50%; background: #f4efe0; }
+.portal-person::before { content: ''; position: absolute; width: 8px; height: 8px; border: 1.5px solid #444; border-radius: 50%; top: 5px; left: 11px; }
+.portal-person::after { content: ''; position: absolute; width: 15px; height: 8px; border: 1.5px solid #444; border-bottom: 0; border-radius: 12px 12px 0 0; bottom: 5px; left: 7px; }
+.portal-nav { display: flex; gap: 32px; height: 58px; align-items: stretch; padding: 0 4.5%; border-bottom: 1px solid #ddd; background: #faf9f4; }
+.portal-nav a { display: flex; align-items: center; color: #333; font-size: 14px; text-decoration: none; border-bottom: 2px solid transparent; }
+.portal-nav a:hover { border-color: #eb052f; }
+.portal-nav a[aria-current="page"] { border-color: #eb052f; font-weight: 600; }
+.portal-main { padding: 36px 4.5% 80px; max-width: 1500px; margin: 0 auto; }
+.portal-welcome { margin-bottom: 30px; }
+.portal-welcome h1 { margin: 0 0 4px; font-size: 30px; font-weight: 750; letter-spacing: -.9px; line-height: 1.2; }
+.portal-welcome p { margin: 0; color: #666; font-size: 15px; }
+.portal-dashboard { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: 24px; }
+.portal-panel { border: 1px solid #ddd; border-radius: 9px; padding: 24px; background: white; box-shadow: 0 1px 3px #00000008; }
+.portal-panel h2 { font-size: 18px; font-weight: 700; line-height: 1.3; margin: 0 0 20px; letter-spacing: -.3px; }
+.portal-access-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 17px 0; border-top: 1px solid #eee; }
+.portal-access-row p { margin: 4px 0 0; color: #777; font-size: 13px; }
+.portal-access-row strong { font-size: 14px; font-weight: 600; }
+.portal-action { display: inline-flex; justify-content: center; align-items: center; flex-shrink: 0; border: 1px solid #ddd; border-radius: 6px; background: white; padding: 7px 12px; color: #333; font-size: 12px; font-weight: 600; text-decoration: none; }
+.portal-action:hover { background: #faf9f4; color: #333; text-decoration: none; }
+.portal-access-level h2 { margin: 12px 0 10px; font-size: 22px; }
+.portal-access-level p { max-width: 380px; color: #555; }
+.portal-access-level .portal-muted { font-size: 13px; color: #777; margin-top: 20px; }
+.portal-status { display: inline-block; color: #476457; background: #f1f5f3; border: 1px solid #d9e3dd; border-radius: 20px; padding: 2px 9px; font-size: 11px; }
+.portal-diagnostics { margin-top: 28px; border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px 20px; color: #555; font-size: 13px; }
+.portal-diagnostics > summary { cursor: pointer; font-weight: 500; }
+.portal-diagnostics[open] > summary { margin-bottom: 20px; }
+.portal-diagnostics table { width: 100%; table-layout: fixed; margin: 20px 0; }
+.portal-diagnostics td, .portal-diagnostics th { padding: 10px; overflow-wrap: anywhere; font-size: 12px; vertical-align: top; border-bottom: 1px solid #eee; }
+.portal-diagnostics th h4 { font-size: 13px; }
+.portal-account-name { overflow-wrap: anywhere; font-size: 13px; }
+.kombit-shell .portal-home #emergency-setup { border: 1px solid #ddd; background: white; border-radius: 9px; padding: 20px; margin: 24px 0 0; font-size: 13px; }
+.kombit-shell .portal-home #emergency-setup h2 { font-size: 15px; margin: 0 0 8px; font-weight: 700; }
+.kombit-shell .portal-home #emergency-setup p { font-size: 13px; line-height: 1.5; color: #666; margin: 0 0 14px; }
+.kombit-shell .portal-home #emergency-setup[data-state="setup"] { position: fixed; right: 24px; bottom: 24px; z-index: 90; width: 350px; max-width: calc(100vw - 32px); box-shadow: 0 4px 22px #00000012; margin: 0; }
+.kombit-shell .portal-home #emergency-setup[data-state="ready"] { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 24px; padding: 16px 20px; }
+.kombit-shell .portal-home #emergency-setup[data-state="ready"] h2 { margin: 0; }
+.kombit-shell .portal-home #emergency-setup[data-state="ready"] p { margin: 0; flex: 1; }
+.kombit-shell .portal-home #emergency-setup .btn { font-size: 12px; padding: 7px 12px; border-radius: 6px; }
+.kombit-shell .portal-home #emergency-setup .btn-primary { background: #eb052f; border-color: #eb052f; }
+.kombit-shell .portal-home .emergency-setup-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.kombit-shell .login-page { margin-top: 28px; }
+.kombit-emergency { background: #fff; font-family: Arial, Helvetica, sans-serif; }
+.kombit-emergency .topbar { background: #faf9f4; }
+.kombit-emergency .topbar-inner { max-width: none; min-height: 72px; padding: 0 4.5%; }
+.emergency-dialog, .key-settings { font-family: Arial, Helvetica, sans-serif; }
+@media (max-width: 700px) {
+ .portal-header { height: 64px; gap: 10px; padding: 0 18px; }
+ .portal-logo { padding-right: 12px; }
+ .portal-logo img { width: 100px; }
+ .portal-name { font-size: 14px; }
+ .portal-prototype, .portal-settings > span:last-child { display: none; }
+ .portal-nav { padding: 0 18px; gap: 24px; height: 50px; }
+ .portal-nav a { font-size: 12px; }
+ .portal-main { padding: 28px 18px 240px; }
+ .portal-dashboard { grid-template-columns: 1fr; gap: 16px; }
+ .portal-panel { padding: 20px; }
+ .portal-welcome h1 { font-size: 26px; }
+ .portal-access-row { gap: 12px; }
+ .portal-access-row p { max-width: 190px; }
+ .kombit-shell .portal-home #emergency-setup[data-state="setup"] { right: 16px; bottom: 16px; width: 330px; }
+ .kombit-shell .portal-home #emergency-setup[data-state="ready"] { display: block; }
+ .kombit-shell .portal-home #emergency-setup[data-state="ready"] p { margin: 8px 0 12px; }
+}
+
+/* Presenter controls for this demo application. */
+.scenario-panel { position: fixed; z-index: 200; left: 24px; bottom: 24px; width: 304px; max-width: calc(100vw - 32px); background: #202020; color: #eee; border: 1px solid #444; border-radius: 10px; box-shadow: 0 8px 28px #0003; font: 13px/1.4 Arial, sans-serif; overflow: hidden; }
+.scenario-panel button { display: block; width: 100%; text-align: left; border: 0; border-radius: 0; padding: 12px 16px; background: transparent; color: #ddd; font: inherit; cursor: pointer; }
+.scenario-panel button:hover { background: #343434; color: white; }
+.scenario-panel .scenario-toggle { font-weight: 700; padding: 14px 16px; }
+.scenario-toggle::after { content: '+'; float: right; font-size: 17px; }
+.scenario-toggle[aria-expanded="true"]::after { content: '−'; }
+.scenario-content { max-height: min(560px, calc(100dvh - 130px)); overflow: auto; }
+.scenario-content[hidden] { display: none; }
+.scenario-current { color: #aaa; font-size: 11px; padding: 0 16px 12px; margin: 0; }
+.scenario-group { border-top: 1px solid #414141; }
+.scenario-group summary { padding: 13px 16px; cursor: pointer; font-weight: 600; }
+.scenario-group button { padding-left: 20px; background: #292929; }
+.scenario-group button strong, .scenario-group button span { display: block; }
+.scenario-group button span { color: #aaa; font-size: 11px; margin-top: 4px; }
+.scenario-group p { padding: 0 16px; font-size: 12px; color: #bbb; }
+.scenario-log { padding: 0 20px 12px 32px; color: #ccc; font-size: 11px; }
+.scenario-log li { margin-bottom: 10px; overflow-wrap: anywhere; }
+.scenario-banner { background: #fff4d6; color: #5c4300; border-bottom: 1px solid #e4cf94; padding: 8px 4.5%; font: 12px/1.5 Arial, sans-serif; display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+.scenario-banner button { border: 1px solid #b9a363; border-radius: 5px; background: transparent; color: inherit; padding: 4px 9px; font: inherit; cursor: pointer; flex-shrink: 0; }
+@media (max-width: 700px) { .scenario-panel { left: 16px; bottom: 16px; width: 200px; } .scenario-panel:has(.scenario-toggle[aria-expanded="true"]) { width: calc(100vw - 32px); } .scenario-banner { padding: 8px 18px; } .kombit-shell .portal-home #emergency-setup[data-state="setup"], .emergency-dock { bottom: 78px; } }

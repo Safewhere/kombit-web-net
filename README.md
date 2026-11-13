@@ -78,3 +78,7 @@ Port `8080` uses HTTP in this test configuration. Do not change the endpoint to 
 `http://test1.ekstern-test.nspop.dk:8080/nts/service-01172024?wsdl`
 
 If the WSDL changes, regenerate the reference with the .NET Framework 4.8 `SvcUtil.exe` tool and review the generated code before replacing the existing file. Do not manually edit the generated file.
+
+## Optional emergency access
+
+Emergency support is disabled by default. See [the emergency PoC guide](README-emergency.md) for configuration, preparation, tests, and known limits.

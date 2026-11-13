@@ -1,0 +1,106 @@
+<%@ Master Language="C#" %>
+<%@ Import Namespace="Kombit.Samples.CH.WebsiteDemo.EmergencyFeature" %>
+<%@ Import Namespace="System.Security.Claims" %>
+<%@ Import Namespace="System" %>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Emergency access — SAML sample</title>
+    <link rel="stylesheet" href="<%= ResolveUrl("~/EmergencyAssets/emergency.css") %>" />
+</head>
+<body>
+<% EmergencyPage view = (EmergencyPage)Page; %>
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="brand" href="<%= ResolveUrl("~/Default.aspx") %>"><span class="brand-mark" aria-hidden="true">!</span>SAML sample</a>
+        <nav aria-label="Emergency access">
+            <a href="<%= ResolveUrl("~/Default.aspx") %>">Normal application</a>
+            <a href="<%= ResolveUrl("~/Emergency.aspx") %>" <% if (view.Mode == "prepare") { %>aria-current="page"<% } %>>Prepare</a>
+            <a href="<%= ResolveUrl("~/EmergencyLogin.aspx") %>" <% if (view.Mode == "login") { %>aria-current="page"<% } %>>Emergency login</a>
+        </nav>
+    </div>
+</header>
+<main id="saml-emergency" data-api="<%= ResolveUrl("~/EmergencyApi.ashx") %>" data-mode="<%: view.Mode %>">
+    <div class="page-head">
+        <h1>Emergency access</h1>
+        <p class="notice"><strong>Proof of concept.</strong> Emergency access uses local key verification. It does not provide normal NSIS assurance.</p>
+    </div>
+    <input id="csrf" type="hidden" value="<%: view.CsrfToken %>" />
+    <p id="status" role="status" aria-live="polite"></p>
+
+<% if (view.Mode == "prepare") { %>
+    <section class="card">
+        <h2>Prepare this browser</h2>
+        <p class="lead">Use a security key or passkey. User presence is required; user verification is preferred. Preparation has three parts: registration, browser storage, and a separate key check.</p>
+        <ol class="steps">
+            <li id="normal-login-step" <% if (view.CanPrepare) { %>hidden<% } %>>
+                <span class="step-title">Start from a recent normal login</span>
+                <span class="hint">Preparation and renewal require a fresh normal login.</span>
+                <a class="button secondary" href="<%= ResolveUrl("~/login.ashx?ReturnUrl=Emergency.aspx") %>">Get a new normal login for preparation or renewal</a>
+            </li>
+            <li id="prepare-step" <% if (!view.CanPrepare) { %>hidden<% } %>>
+                <span class="step-title">Register and store a key</span>
+                <span class="hint"><% if (view.CanPrepare) { %>Your browser will ask for the key twice: once to register it, once to confirm it.<% } else { %>Not available yet. Get a new normal login first.<% } %></span>
+                <button id="register" class="primary" type="button" <% if (!view.CanPrepare) { %>disabled<% } %>>Prepare this browser</button>
+            </li>
+        </ol>
+    </section>
+    <section class="card">
+        <h2>Keys stored in this browser</h2>
+        <p id="storage-note" class="hint">Clearing or evicting site data loses preparation. A different browser profile is not prepared.</p>
+        <ul id="saved-keys" class="key-list"><li class="empty">Loading stored keys…</li></ul>
+        <p class="hint">If issuance succeeded but storage or delivery failed, its binding can still count towards the issuer's key limit. Ask an Identify administrator to remove the binding before trying again.</p>
+    </section>
+
+<% } else if (view.Mode == "login") { %>
+    <section class="card">
+        <h2>Local emergency login</h2>
+        <p class="lead">Select a locally stored credential. This page and the key check do not contact Identify.</p>
+        <ul id="saved-keys" class="key-list"><li class="empty">Loading stored keys…</li></ul>
+    </section>
+
+<% } else if (view.Mode == "home") { %>
+    <section class="card">
+        <div class="card-head">
+            <h2>Emergency session</h2>
+            <button id="exit" class="secondary" type="button">Sign out locally</button>
+        </div>
+        <dl class="stats">
+            <div><dt>Session ends</dt><dd><%: DateTimeOffset.FromUnixTimeSeconds(long.Parse(view.EmergencyUser.FindFirst("emergency_expiry").Value)).ToString("u") %></dd></div>
+        </dl>
+        <p class="hint">Normal SAML logout, reauthentication, STS token exchange, and token-based service calls are unavailable.</p>
+    </section>
+    <section class="card">
+        <h3>Permitted claims</h3>
+        <dl class="claims"><% foreach (Claim claim in view.EmergencyUser.Claims) { if (claim.Type != "emergency_session") { %>
+            <div><dt><%: claim.Type %></dt><dd><%: claim.Value %></dd></div><% } } %>
+        </dl>
+    </section>
+
+<% } else { %>
+    <section class="card">
+        <h2>Session ended</h2>
+        <p>Your emergency session expired or was ended. Log in again with a prepared key to continue.</p>
+        <div class="actions">
+            <a class="button primary" href="<%= ResolveUrl("~/EmergencyLogin.aspx") %>">Go to emergency login</a>
+            <a class="button secondary" href="<%= ResolveUrl("~/Default.aspx") %>">Normal application</a>
+        </div>
+    </section>
+<% } %>
+
+    <asp:ContentPlaceHolder ID="Body" runat="server" />
+    <noscript><p class="notice">JavaScript, IndexedDB, and WebAuthn are required.</p></noscript>
+
+    <details id="issuer-diagnostics" class="card">
+        <summary>Identify endpoint results (PoC)</summary>
+        <p class="hint">Results from this browser tab only. Up to 8 latest Identify calls per action and 40 recent entries are shown. Bodies, keys, tokens, and personal claims are omitted. HTTP success alone does not mean preparation or login succeeded.</p>
+        <button id="clear-issuer-diagnostics" class="secondary small" type="button">Clear displayed history</button>
+        <ol id="issuer-call-results" class="log"></ol>
+    </details>
+</main>
+<script src="<%= ResolveUrl("~/EmergencyAssets/emergency.js") %>" defer></script>
+</body>
+</html>

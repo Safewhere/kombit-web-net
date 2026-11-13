@@ -1,0 +1,14 @@
+{
+  "Origin": "https://saml.example.invalid",
+  "RpId": "saml.example.invalid",
+  "EmergencyIssuer": "https://identify.example.invalid/runtime/emergency",
+  "IssuerRuntimeUrl": "https://identify.example.invalid/runtime/",
+  "NormalSamlIssuer": "urn:example:identify:idp",
+  "Audience": "urn:emergency:saml-example",
+  "StateDirectory": "C:\\ProgramData\\SafewhereSamples\\SamlEmergency\\state",
+  "PrivateEncryptionKeyFile": "C:\\ProgramData\\SafewhereSamples\\SamlEmergency\\decryption-key.bin",
+  "EncryptionKeyId": "saml-emergency-encryption",
+  "InitialSigningKeysFile": "C:\\ProgramData\\SafewhereSamples\\SamlEmergency\\issuer-signing-keys.json",
+  "ApiKey": "saml-poc-key",
+  "SessionMinutes": 480
+}
